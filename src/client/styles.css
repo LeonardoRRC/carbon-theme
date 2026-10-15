@@ -1,0 +1,848 @@
+@import 'tailwindcss/theme.css' layer(theme) prefix(ct);
+@import 'tailwindcss/utilities.css' layer(utilities) prefix(ct);
+@import '@pterodactyl/sdk/theme.css';
+@source './**/*.{ts,tsx}';
+
+/*
+ * Hand-written rules for markup the Panel renders, outside Tailwind's layers. Every class is
+ * prefixed with ct- and every value comes from the Panel's design tokens, so the theme's
+ * palette applies.
+ */
+
+/* ---------- Server sidebar group titles ---------- */
+
+.ct-nav-heading {
+    display: none;
+}
+
+@media (width >= 64rem) {
+    :root[data-sub-navigation='side'] .ct-nav-heading:not([hidden]) {
+        display: block;
+        padding: 1rem 1rem 0.375rem;
+        font-size: 0.6875rem;
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--muted-foreground);
+        pointer-events: none;
+        user-select: none;
+    }
+}
+
+/* ---------- Dashboard server card: rows ---------- */
+
+a:has(.ct-card) > .status-bar {
+    display: none;
+}
+
+a:has(.ct-card) {
+    transition: border-color 150ms, background-color 150ms, transform 150ms;
+}
+
+a:has(.ct-card):hover {
+    border-color: color-mix(in oklab, var(--primary) 45%, var(--border));
+}
+
+.ct-card {
+    --ct-tone: var(--muted-foreground);
+    display: grid;
+    grid-template-columns: minmax(0, 1.5fr) auto minmax(0, 2fr);
+    align-items: center;
+    gap: 1.25rem;
+}
+
+.ct-status {
+    --ct-tone: var(--muted-foreground);
+}
+
+.ct-card [data-tone='success'],
+.ct-card[data-tone='success'],
+.ct-status[data-tone='success'] {
+    --ct-tone: var(--success);
+}
+
+.ct-card [data-tone='warning'],
+.ct-card[data-tone='warning'],
+.ct-status[data-tone='warning'] {
+    --ct-tone: var(--warning);
+}
+
+.ct-card [data-tone='danger'],
+.ct-card[data-tone='danger'],
+.ct-status[data-tone='danger'] {
+    --ct-tone: var(--destructive);
+}
+
+.ct-card-main {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    min-width: 0;
+}
+
+/* The Panel's identity part: server icon, name, description, and its slot. */
+.ct-card-main > :first-child {
+    flex: 1;
+    min-width: 0;
+}
+
+.ct-card .icon {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    margin-right: 0.75rem !important;
+    border-radius: calc(var(--radius) * 1.2);
+    background: color-mix(in oklab, var(--primary) 16%, transparent);
+    color: var(--primary);
+    font-size: 1.15rem;
+}
+
+.ct-card p.text-lg {
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: 1.3;
+}
+
+.ct-status {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.25rem 0.625rem;
+    border-radius: 999px;
+    background: color-mix(in oklab, var(--ct-tone) 14%, transparent);
+    color: var(--ct-tone);
+    font-size: 0.75rem;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.ct-status i {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+    background: currentColor;
+    box-shadow: 0 0 0 3px color-mix(in oklab, currentColor 25%, transparent);
+}
+
+.ct-card-meta {
+    display: flex;
+    justify-content: center;
+}
+
+.ct-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: var(--radius);
+    background: var(--muted);
+    color: var(--muted-foreground);
+    font-family: var(--font-mono, ui-monospace, monospace);
+    font-size: 0.75rem;
+    white-space: nowrap;
+}
+
+.ct-metric-icon {
+    width: 0.875rem;
+    height: 0.875rem;
+    flex: none;
+}
+
+.ct-metrics {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1rem;
+}
+
+.ct-metric-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    font-size: 0.75rem;
+    color: var(--muted-foreground);
+    white-space: nowrap;
+}
+
+.ct-metric-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+}
+
+.ct-metric-value {
+    color: var(--foreground);
+    font-weight: 500;
+}
+
+.ct-bar {
+    height: 0.375rem;
+    margin-top: 0.4rem;
+    overflow: hidden;
+    border-radius: 999px;
+    background: var(--muted);
+}
+
+.ct-bar > span {
+    display: block;
+    height: 100%;
+    min-width: 0.375rem;
+    border-radius: inherit;
+    background: var(--primary);
+    transition: width 300ms;
+}
+
+.ct-metric[data-alarm] .ct-bar > span {
+    background: var(--destructive);
+}
+
+.ct-metric[data-alarm] .ct-metric-value {
+    color: var(--destructive);
+}
+
+.ct-metrics-loading {
+    grid-column: 1 / -1;
+    height: 1.75rem;
+    border-radius: var(--radius);
+    background: var(--muted);
+    animation: ct-pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes ct-pulse {
+    50% {
+        opacity: 0.45;
+    }
+}
+
+@media (width < 64rem) {
+    .ct-card {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 0.875rem;
+    }
+
+    .ct-card-meta {
+        justify-content: flex-start;
+    }
+}
+
+/* ---------- Dashboard server card: cards ---------- */
+
+:root[data-ct-dashboard='cards'] div:has(> a .ct-card) {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(19rem, 1fr));
+    gap: 1rem;
+    align-items: stretch;
+}
+
+:root[data-ct-dashboard='cards'] div:has(> a .ct-card) > :not(a) {
+    grid-column: 1 / -1;
+}
+
+:root[data-ct-dashboard='cards'] div:has(> a .ct-card) > a {
+    margin: 0 !important;
+    height: 100%;
+}
+
+:root[data-ct-dashboard='cards'] a:has(.ct-card):hover {
+    transform: translateY(-2px);
+}
+
+:root[data-ct-dashboard='cards'] .ct-card {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1rem;
+    height: 100%;
+    align-content: start;
+}
+
+:root[data-ct-dashboard='cards'] .ct-card-main {
+    align-items: flex-start;
+}
+
+:root[data-ct-dashboard='cards'] .ct-card-meta {
+    justify-content: flex-start;
+}
+
+:root[data-ct-dashboard='cards'] .ct-metrics {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.75rem;
+    padding-top: 0.875rem;
+    border-top: 1px solid var(--border);
+}
+
+/* ---------- Server console: Carbon style ----------
+ * The runtime marks the console blocks with data-ct-console (root, header, main, terminal,
+ * stats, charts). Everything below applies only with <html data-ct-console-style="carbon">.
+ */
+
+/* Header: name, description, live status, and power buttons in one card. */
+:root[data-ct-console-style='carbon'] [data-ct-console='header'] {
+    align-items: center;
+    padding: 1.25rem 1.5rem;
+    border: 1px solid var(--border);
+    border-radius: calc(var(--radius) * 1.6);
+    background:
+        radial-gradient(120% 140% at 0% 0%, color-mix(in oklab, var(--primary) 14%, transparent), transparent 55%),
+        var(--card);
+}
+
+:root[data-ct-console-style='carbon'] [data-ct-console='header'] h1 {
+    font-size: 1.625rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+}
+
+:root[data-ct-console-style='carbon'] [data-ct-console='header'] > :last-child {
+    align-self: center;
+    display: flex;
+    flex-direction: column;
+    gap: 0.625rem;
+}
+
+.ct-console-status {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.ct-console-uptime {
+    color: var(--muted-foreground);
+    font-weight: 400;
+}
+
+:root[data-ct-console-style='carbon'] [data-ct-console='header'] button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    border-radius: 999px !important;
+    padding: 0.5rem 1rem !important;
+    text-transform: none !important;
+    letter-spacing: 0 !important;
+    font-weight: 500;
+}
+
+:root[data-ct-console-style='carbon'] [data-ct-console='header'] button::before {
+    content: '';
+    width: 0.9rem;
+    height: 0.9rem;
+    flex: none;
+    background-color: currentColor;
+    mask: var(--ct-power-icon) center / contain no-repeat;
+}
+
+/* Start, Restart, Stop: the Panel always renders them in this order. */
+:root[data-ct-console-style='carbon'] [data-ct-console='header'] button:nth-of-type(1) {
+    --ct-power-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 4l14 8-14 8z'/%3E%3C/svg%3E");
+    background: var(--success) !important;
+    border-color: var(--success) !important;
+    color: var(--success-foreground) !important;
+}
+
+:root[data-ct-console-style='carbon'] [data-ct-console='header'] button:nth-of-type(2) {
+    --ct-power-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M21 12a9 9 0 1 1-3-6.7L21 8'/%3E%3Cpath d='M21 3v5h-5'/%3E%3C/svg%3E");
+    background: var(--secondary) !important;
+    border-color: var(--border) !important;
+    color: var(--secondary-foreground) !important;
+}
+
+:root[data-ct-console-style='carbon'] [data-ct-console='header'] button:nth-of-type(3) {
+    --ct-power-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23000'%3E%3Crect x='6' y='6' width='12' height='12' rx='2'/%3E%3C/svg%3E");
+    background: color-mix(in oklab, var(--destructive) 14%, transparent) !important;
+    border-color: color-mix(in oklab, var(--destructive) 55%, transparent) !important;
+    color: var(--destructive) !important;
+}
+
+:root[data-ct-console-style='carbon'] [data-ct-console='header'] button:not(:disabled):hover {
+    filter: brightness(1.12);
+}
+
+:root[data-ct-console-style='carbon'] [data-ct-console='header'] button:disabled {
+    opacity: 0.4;
+}
+
+/* Stat tiles in a row above a full-width terminal. */
+:root[data-ct-console-style='carbon'] [data-ct-console='main'] {
+    display: flex !important;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+/* Two rows of four on wide screens: the address takes two columns so it is not cut off. */
+:root[data-ct-console-style='carbon'] [data-ct-console='stats'] {
+    order: -1;
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 0.75rem !important;
+}
+
+@media (width >= 48rem) {
+    :root[data-ct-console-style='carbon'] [data-ct-console='stats'] {
+        grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    }
+}
+
+:root[data-ct-console-style='carbon'] [data-ct-console='stats'] > * {
+    grid-column: auto !important;
+    min-width: 0;
+    gap: 0.75rem;
+    padding: 0.75rem 0.875rem !important;
+    border: 1px solid var(--border);
+    border-radius: calc(var(--radius) * 1.4);
+    background: var(--card);
+    box-shadow: none !important;
+}
+
+:root[data-ct-console-style='carbon'] [data-ct-console='stats'] > :first-child {
+    grid-column: span 2 !important;
+}
+
+:root[data-ct-console-style='carbon'] [data-ct-console='stats'] > * > .absolute {
+    display: none;
+}
+
+:root[data-ct-console-style='carbon'] [data-ct-console='stats'] > * > div:nth-child(2) {
+    width: 2.25rem !important;
+    height: 2.25rem !important;
+    margin: 0 !important;
+    border-radius: 999px !important;
+    box-shadow: none !important;
+}
+
+:root[data-ct-console-style='carbon'] [data-ct-console='stats'] p {
+    font-family: var(--font-sans);
+    font-size: 0.6875rem !important;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--muted-foreground) !important;
+}
+
+:root[data-ct-console-style='carbon'] [data-ct-console='stats'] p + div {
+    font-size: 1rem !important;
+    line-height: 1.6rem !important;
+    height: 1.6rem !important;
+}
+
+/* The terminal as a window, with a title bar. */
+:root[data-ct-console-style='carbon'] [data-ct-console='terminal'] > div {
+    overflow: hidden;
+    border: 1px solid var(--border);
+    border-radius: calc(var(--radius) * 1.6);
+    box-shadow: 0 18px 40px -18px rgb(0 0 0 / 0.6);
+}
+
+:root[data-ct-console-style='carbon'] [data-ct-console='terminal'] > div::before {
+    content: 'Console';
+    display: flex;
+    align-items: center;
+    height: 2.25rem;
+    padding-left: 4.5rem;
+    border-bottom: 1px solid var(--border);
+    background:
+        radial-gradient(circle at 1.125rem 50%, color-mix(in oklab, var(--destructive) 80%, transparent) 0.3rem, transparent 0.32rem),
+        radial-gradient(circle at 2rem 50%, color-mix(in oklab, var(--warning) 80%, transparent) 0.3rem, transparent 0.32rem),
+        radial-gradient(circle at 2.875rem 50%, color-mix(in oklab, var(--success) 80%, transparent) 0.3rem, transparent 0.32rem),
+        var(--card);
+    color: var(--muted-foreground);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+:root[data-ct-console-style='carbon'] [data-ct-console='terminal'] div.bg-terminal {
+    min-height: 28rem;
+    border-radius: 0 !important;
+}
+
+:root[data-ct-console-style='carbon'] [data-ct-console='terminal'] input {
+    border-width: 1px 0 0 !important;
+    border-color: var(--border) !important;
+    border-radius: 0 !important;
+}
+
+:root[data-ct-console-style='carbon'] [data-ct-console='terminal'] input + div {
+    color: var(--primary);
+}
+
+/* Charts as matching cards. */
+:root[data-ct-console-style='carbon'] [data-ct-console='charts'] > * {
+    overflow: hidden;
+    border: 1px solid var(--border) !important;
+    border-radius: calc(var(--radius) * 1.6) !important;
+    background: var(--card) !important;
+    box-shadow: none !important;
+}
+
+:root[data-ct-console-style='carbon'] [data-ct-console='charts'] h3 {
+    font-family: var(--font-sans);
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--muted-foreground);
+}
+
+/* On phones the Panel widens the terminal past the page edges; inside the framed window it stays in. */
+:root[data-ct-console-style='carbon'] [data-ct-console='terminal'] > div > div {
+    margin-left: 0 !important;
+    width: 100% !important;
+}
+
+/* ---------- File manager: Carbon style ---------- */
+
+.ct-files {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.ct-files-head {
+    display: flex;
+    align-items: center;
+    gap: 0.875rem;
+    padding: 1rem 1.25rem;
+    border: 1px solid var(--border);
+    border-radius: calc(var(--radius) * 1.6);
+    background:
+        radial-gradient(120% 140% at 0% 0%, color-mix(in oklab, var(--primary) 14%, transparent), transparent 55%),
+        var(--card);
+}
+
+.ct-files-head-icon {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: calc(var(--radius) * 1.4);
+    background: color-mix(in oklab, var(--primary) 16%, transparent);
+    color: var(--primary);
+    font-size: 1.25rem;
+}
+
+.ct-files-head-text {
+    min-width: 0;
+    flex: 1;
+}
+
+.ct-files-title {
+    overflow: hidden;
+    font-family: var(--font-header);
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--foreground);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.ct-files-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 0.875rem;
+    margin-top: 0.125rem;
+    font-size: 0.8125rem;
+    color: var(--muted-foreground);
+}
+
+.ct-files-meta > span + span::before {
+    content: '·';
+    margin-right: 0.875rem;
+    opacity: 0.6;
+}
+
+.ct-files-refreshing {
+    font-size: 0.75rem;
+    color: var(--muted-foreground);
+}
+
+.ct-files-window {
+    overflow: hidden;
+    border: 1px solid var(--border);
+    border-radius: calc(var(--radius) * 1.6);
+    background: var(--card);
+    box-shadow: 0 18px 40px -22px rgb(0 0 0 / 0.6);
+}
+
+/* The Panel's toolbar (select all, path, and buttons) as the window's title bar. */
+.ct-files-bar {
+    padding: 0.625rem 0.875rem;
+    border-bottom: 1px solid var(--border);
+    background: color-mix(in oklab, var(--card) 70%, var(--background));
+}
+
+.ct-files-bar > * {
+    margin: 0 !important;
+}
+
+.ct-files-bar button {
+    border-radius: 999px !important;
+    text-transform: none !important;
+    letter-spacing: 0 !important;
+    font-weight: 500;
+}
+
+/* Rows: flat, separated by hairlines, highlighted on hover. */
+.ct-files-list > * {
+    margin: 0 !important;
+}
+
+.ct-files-list [class*='bg-card'],
+.ct-files-list [class*='bg-popover'] {
+    background: transparent !important;
+}
+
+.ct-files-list .ct-file-row {
+    align-items: center;
+}
+
+/* The whole row: checkbox, link, and options button. */
+.ct-files-list div:has(> a > .ct-file-row) {
+    margin: 0 !important;
+    border-radius: 0 !important;
+    border-bottom: 1px solid color-mix(in oklab, var(--border) 70%, transparent);
+    transition: background-color 120ms;
+}
+
+.ct-files-list div:has(> a > .ct-file-row):hover {
+    background: color-mix(in oklab, var(--primary) 7%, transparent) !important;
+}
+
+/* Starts after the row's checkbox, which the Panel lays over the left edge of the row. */
+.ct-file-icon {
+    --ct-tone: var(--muted-foreground);
+    display: inline-grid;
+    flex: none;
+    place-items: center;
+    width: 1.875rem;
+    height: 1.875rem;
+    margin-left: 1.75rem;
+    margin-right: 0.75rem;
+    border-radius: calc(var(--radius) * 1.1);
+    background: color-mix(in oklab, var(--ct-tone) 15%, transparent);
+    color: var(--ct-tone);
+}
+
+.ct-file-icon svg {
+    width: 1rem;
+    height: 1rem;
+}
+
+.ct-file-icon[data-tone='primary'] {
+    --ct-tone: var(--primary);
+}
+
+.ct-file-icon[data-tone='accent'] {
+    --ct-tone: var(--accent);
+}
+
+.ct-file-icon[data-tone='success'] {
+    --ct-tone: var(--success);
+}
+
+.ct-file-icon[data-tone='warning'] {
+    --ct-tone: var(--warning);
+}
+
+.ct-file-icon[data-tone='chart-3'] {
+    --ct-tone: var(--chart-3, var(--accent));
+}
+
+.ct-file-icon[data-tone='chart-4'] {
+    --ct-tone: var(--chart-4, var(--primary));
+}
+
+/* The Panel's selection bar (move, archive, delete) with the same buttons as the toolbar. */
+.ct-files-selection button {
+    border-radius: 999px !important;
+    text-transform: none !important;
+    letter-spacing: 0 !important;
+    font-weight: 500;
+}
+
+.ct-files-selection > * > * {
+    border-radius: 999px;
+    box-shadow: 0 12px 32px -8px rgb(0 0 0 / 0.55);
+}
+
+/* ---------- Sign-in pages: Centered and Split ----------
+ * The runtime marks the blocks with data-ct-auth (layout, box, title, card, mark, footer);
+ * AuthHead sets <html data-ct-auth-page> while a sign-in view is shown.
+ */
+
+:root:is([data-ct-auth-style='centered'], [data-ct-auth-style='split'])[data-ct-auth-page] body {
+    min-height: 100vh;
+    background-color: var(--background);
+    background-image:
+        radial-gradient(70% 55% at 12% 0%, color-mix(in oklab, var(--foreground) 9%, transparent), transparent 70%),
+        radial-gradient(60% 60% at 100% 100%, color-mix(in oklab, var(--primary) 11%, transparent), transparent 70%),
+        linear-gradient(165deg, color-mix(in oklab, var(--card) 88%, var(--foreground) 5%), var(--background) 58%);
+    background-attachment: fixed;
+}
+
+:root:is([data-ct-auth-style='centered'], [data-ct-auth-style='split'])[data-ct-auth-page] [data-ct-auth='layout'] {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 2.5rem 1rem !important;
+}
+
+:root:is([data-ct-auth-style='centered'], [data-ct-auth-style='split'])[data-ct-auth-page] :is([data-ct-auth='title'], [data-ct-auth='mark']) {
+    display: none !important;
+}
+
+:root:is([data-ct-auth-style='centered'], [data-ct-auth-style='split'])[data-ct-auth-page] [data-ct-auth='box'] {
+    width: 100%;
+    max-width: 23rem !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+:root:is([data-ct-auth-style='centered'], [data-ct-auth-style='split'])[data-ct-auth-page] [data-ct-auth='card'] {
+    display: block !important;
+    margin: 0 !important;
+    padding: 1.75rem !important;
+    border: 1px solid color-mix(in oklab, var(--border) 80%, transparent);
+    border-radius: calc(var(--radius) * 2.4) !important;
+    background: color-mix(in oklab, var(--card) 90%, transparent) !important;
+    backdrop-filter: blur(14px);
+    box-shadow: 0 30px 60px -30px rgb(0 0 0 / 0.7) !important;
+}
+
+:root:is([data-ct-auth-style='centered'], [data-ct-auth-style='split'])[data-ct-auth-page] [data-ct-auth='card'] label {
+    text-transform: none !important;
+    letter-spacing: 0 !important;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--foreground);
+}
+
+:root:is([data-ct-auth-style='centered'], [data-ct-auth-style='split'])[data-ct-auth-page] [data-ct-auth='card'] input {
+    border-radius: calc(var(--radius) * 1.4) !important;
+}
+
+:root:is([data-ct-auth-style='centered'], [data-ct-auth-style='split'])[data-ct-auth-page] [data-ct-auth='card'] button {
+    width: 100%;
+    border-radius: calc(var(--radius) * 1.4) !important;
+    text-transform: none !important;
+    letter-spacing: 0 !important;
+    font-weight: 600;
+}
+
+:root:is([data-ct-auth-style='centered'], [data-ct-auth-style='split'])[data-ct-auth-page] [data-ct-auth='card'] a {
+    text-transform: none !important;
+    letter-spacing: 0 !important;
+    font-size: 0.875rem !important;
+}
+
+:root:is([data-ct-auth-style='centered'], [data-ct-auth-style='split'])[data-ct-auth-page] [data-ct-auth='footer'] {
+    margin-top: 1.25rem !important;
+}
+
+.ct-auth-head {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.375rem;
+    max-width: 26rem;
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+.ct-auth-subtitle {
+    font-size: 0.95rem;
+    color: var(--muted-foreground);
+}
+
+.ct-auth-title {
+    font-family: var(--font-header);
+    font-size: 1.625rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: var(--foreground);
+}
+
+.ct-auth-logo {
+    display: none;
+}
+
+:root[data-ct-logo] .ct-auth-logo {
+    display: block;
+    height: 2rem;
+    max-width: 12rem;
+    aspect-ratio: var(--ct-logo-ratio, 1);
+    background: var(--ct-logo) left center / contain no-repeat;
+}
+
+:root[data-ct-logo] .ct-auth-logo-lg {
+    height: 3rem;
+    margin-bottom: 0.875rem;
+    background-position: center;
+}
+
+/* Split: a brand panel on the left from 1024px; narrower screens use the centered layout. */
+.ct-auth-panel {
+    display: none;
+}
+
+@media (width >= 64rem) {
+    :root[data-ct-auth-style='split'][data-ct-auth-page] .ct-auth-panel {
+        position: fixed;
+        top: 1rem;
+        bottom: 1rem;
+        left: 1rem;
+        display: block;
+        width: min(38vw, 40rem);
+        overflow: hidden;
+        border: 1px solid color-mix(in oklab, var(--border) 80%, transparent);
+        border-radius: calc(var(--radius) * 3);
+        background:
+            radial-gradient(90% 60% at 30% 100%, color-mix(in oklab, var(--foreground) 10%, transparent), transparent 70%),
+            linear-gradient(180deg, var(--card), color-mix(in oklab, var(--card) 65%, var(--background)));
+    }
+
+    :root[data-ct-auth-style='split'][data-ct-auth-page] [data-ct-auth='layout'] {
+        padding-left: calc(min(38vw, 40rem) + 2rem) !important;
+    }
+}
+
+.ct-auth-brand {
+    position: absolute;
+    top: 1.75rem;
+    left: 1.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.ct-auth-brand-name {
+    font-family: var(--font-header);
+    font-size: 1.25rem;
+    font-weight: 500;
+    color: var(--foreground);
+}
+
+/* With a logo, a large faded copy of it; without one, a fading line grid. */
+.ct-auth-watermark {
+    position: absolute;
+    right: -12%;
+    bottom: -12%;
+    width: 78%;
+    aspect-ratio: 1;
+    background-image:
+        linear-gradient(color-mix(in oklab, var(--foreground) 12%, transparent) 1px, transparent 1px),
+        linear-gradient(90deg, color-mix(in oklab, var(--foreground) 12%, transparent) 1px, transparent 1px);
+    background-size: 2rem 2rem;
+    mask-image: radial-gradient(circle at 60% 60%, #000, transparent 70%);
+}
+
+:root[data-ct-logo] .ct-auth-watermark {
+    background: var(--ct-logo) center / contain no-repeat;
+    opacity: 0.09;
+    filter: grayscale(1) brightness(2.2);
+    mask-image: none;
+}

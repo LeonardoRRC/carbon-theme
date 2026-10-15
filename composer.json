@@ -1,0 +1,17 @@
+{
+    "name": "uk.thequantum/carbon-theme",
+    "description": "Carbon and Gray Carbon dark palettes with an admin palette editor and custom navigation icons.",
+    "autoload": {
+        "psr-4": {
+            "UK\\TheQuantum\\CarbonTheme\\": "src/"
+        }
+    },
+    "config": {
+        "autoloader-suffix": "CarbonThemeExtension"
+    },
+    "authors": [
+        {
+            "name": "The Quantum Development"
+        }
+    ]
+}
