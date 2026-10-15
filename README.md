@@ -41,7 +41,7 @@ A free dark theme for Pterodactyl 2.0 by The Quantum Development, with an editor
 
 ## Installing
 
-Upload `carbon-theme-1.3.0.pteroext` in **Admin → Extensions**, or from the Panel root:
+Download [`carbon-theme-1.3.0.pteroext`](https://github.com/LeonardoRRC/carbon-theme/releases/download/v1.3.0/carbon-theme-1.3.0.pteroext) from the [latest release](https://github.com/LeonardoRRC/carbon-theme/releases/latest), then upload it in **Admin → Extensions**, or install it from the Panel root:
 
 ```bash
 php artisan p:extension:install carbon-theme-1.3.0.pteroext --enable
