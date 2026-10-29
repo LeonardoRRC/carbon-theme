@@ -3,26 +3,28 @@
 namespace UK\TheQuantum\CarbonTheme\Support;
 
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\File;
-use Pterodactyl\Actions\Themes\ApplyTheme;
-use Pterodactyl\Actions\Themes\ResetTheme;
+use Pterodactyl\Contracts\Themes\ActivatesThemes;
 use Pterodactyl\Services\Extensions\ExtensionHeadTags;
 use Pterodactyl\Services\Extensions\ExtensionRepository;
-use Pterodactyl\Services\Themes\ThemeService;
 
 /**
- * The saved theme configuration, the stylesheet built from it, and its publication as the
- * Panel's applied theme. Publishing through the Panel's theme system puts the stylesheet in
- * the page <head>, so the theme is in place before the first paint, including the login page.
+ * The saved theme configuration and the stylesheet built from it. Carbon is a Panel theme: its
+ * base stylesheet (dist/theme.css) is linked in the page <head>, and the stylesheet built from
+ * this configuration is served by the extension at /extensions/carbon-theme/theme.css, which
+ * the frontend links before the Panel is shown, so nothing flashes, including the login page.
  */
 final class ThemeStore
 {
     public const ID = 'carbon-theme';
 
-    /** First line of the published stylesheet, to tell it apart from another theme. */
+    /** First line of the built stylesheet. */
     public const MARKER = '/* Carbon Theme';
 
-    private const PUBLISHED_KEY = 'ext:carbon-theme:published';
+    /**
+     * The built stylesheet for a build of the extension and a revision: a save writes a new
+     * revision and an update changes the build, so nothing stale is served.
+     */
+    private const CSS_KEY = 'ext:carbon-theme:css:%s:%d';
 
     public function __construct(
         private readonly ExtensionRepository $extensions,
@@ -90,7 +92,7 @@ final class ThemeStore
             $fonts['imports'],
             Layout::GATE,
             $config['preset'] === 'none' ? '' : Palette::css($config['colors'], $config['radius']),
-            $config['preset'] === 'none' || $config['layout']['console'] !== 'carbon' ? '' : Palette::consoleCss($config['colors']),
+            $config['preset'] === 'none' || $config['layout']['console'] === 'panel' ? '' : Palette::consoleCss($config['colors']),
             $fonts['rules'],
             Layout::css($config['layout']),
             Branding::css($config['branding'], $config['revision']),
@@ -107,55 +109,73 @@ final class ThemeStore
         return Branding::headTags($config['branding'], $config['revision']);
     }
 
-    /**
-     * Writes the theme to themes/carbon-theme and applies it with the Panel's own action,
-     * which publishes tokens.css as /assets/theme.css and assets/ as /assets/theme.
-     */
-    public function publish(): void
+    /** The built stylesheet of the saved configuration, built once per revision. */
+    public function stylesheet(): string
     {
         $config = $this->config();
-        $themes = app(ThemeService::class);
-        $directory = $themes->directory().DIRECTORY_SEPARATOR.self::ID;
 
-        File::ensureDirectoryExists($directory);
-        File::put($directory.'/theme.json', json_encode([
-            'id' => self::ID,
-            'name' => 'Carbon Theme (managed by the Carbon Theme extension)',
-            'version' => (string) $config['revision'],
-        ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)."\n");
-        File::put($directory.'/tokens.css', $this->css($config));
+        return Cache::rememberForever($this->cacheKey($config['revision']), function () use ($config): string {
+            rescue(fn () => $this->syncThemeSettings($config));
 
-        File::deleteDirectory($directory.'/assets');
-        foreach (['brand', 'fonts'] as $folder) {
-            if (File::isDirectory($this->branding->directory($folder))) {
-                File::copyDirectory($this->branding->directory($folder), $directory.'/assets/'.$folder);
-            }
-        }
-
-        app(ApplyTheme::class)->apply(self::ID);
-        app(ExtensionHeadTags::class)->forget(self::ID);
-        Cache::forever(self::PUBLISHED_KEY, true);
+            return $this->css($config);
+        });
     }
 
     /**
-     * Publishes once after the extension is enabled. Afterwards an administrator may apply
-     * another theme with p:theme:apply, and it is left alone until the next save.
+     * Copies the palette into the theme settings the manifest declares under "Carbon (managed)".
+     * The Panel writes those as tokens in the page head, before any stylesheet or script loads, so
+     * the page has Carbon's colours while it loads; the built stylesheet then adds everything else.
+     * With the Panel's own colours ("none") they are cleared, and the Panel's tokens apply.
      */
-    public function publishIfNeeded(): void
+    private function syncThemeSettings(array $config): void
     {
-        if (Cache::get(self::PUBLISHED_KEY) !== true) {
-            $this->publish();
+        $settings = $this->extensions->settings(self::ID);
+        $settings->forgetByPrefix('theme.');
+        if ($config['preset'] === 'none') {
+            return;
         }
+
+        $values = [];
+        foreach (array_keys(Palette::TOKENS) as $token) {
+            $color = $config['colors'][$token] ?? null;
+            if (is_string($color) && preg_match('/^#(?:[0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})$/i', $color)) {
+                $values['theme.'.str_replace('-', '_', $token)] = strtolower($color);
+            }
+        }
+        if (is_numeric($config['radius'] ?? null)) {
+            $values['theme.radius'] = round((float) $config['radius'], 3);
+        }
+        $settings->setMany($values);
     }
 
-    /** Removes the published theme when it is still ours, restoring the Panel's look. */
+    /** Drops what was built from the previous revision, after a save. */
+    public function publish(): void
+    {
+        Cache::forget($this->cacheKey($this->config()['revision']));
+        app(ExtensionHeadTags::class)->forget(self::ID);
+    }
+
+    /**
+     * Makes Carbon the Panel's active theme, as enabling Carbon 1.x applied it. An administrator
+     * can switch to another theme afterwards on Admin > Themes, and it is left alone.
+     */
+    public function activate(): void
+    {
+        app(ActivatesThemes::class)->activate(self::ID);
+    }
+
+    /** The source files that build the stylesheet change with each release of the extension. */
+    private function cacheKey(int $revision): string
+    {
+        $files = [...(glob(__DIR__.'/*.php') ?: []), dirname(__DIR__, 2).'/extension.json'];
+        $build = substr(md5(implode('|', array_map(fn (string $file): string => (string) @filemtime($file), $files))), 0, 12);
+
+        return sprintf(self::CSS_KEY, $build, $revision);
+    }
+
+    /** Forgets the favicon tags; the Panel returns to its own look once Carbon is no longer active. */
     public function unpublish(): void
     {
-        Cache::forget(self::PUBLISHED_KEY);
-        $stylesheet = app(ThemeService::class)->publishedStylesheet();
-        if (is_file($stylesheet) && str_starts_with((string) file_get_contents($stylesheet, length: 64), self::MARKER)) {
-            app(ResetTheme::class)->reset();
-        }
         app(ExtensionHeadTags::class)->forget(self::ID);
     }
 

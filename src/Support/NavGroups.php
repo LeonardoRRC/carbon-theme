@@ -34,6 +34,8 @@ final class NavGroups
         // The admin link always ends the sidebar, with its label shown and a divider above it.
         $rules[] = '[data-ct-route="server:admin-view"]{order:9999;margin-top:.5rem;border-top:1px solid var(--border);white-space:normal!important}';
         $rules[] = '[data-ct-route="server:admin-view"] span span{display:inline!important}';
+        // Panel 2.0 hides the label with sr-only rather than hidden.
+        $rules[] = '[data-ct-route="server:admin-view"] .sr-only{position:static!important;width:auto!important;height:auto!important;margin:0!important;overflow:visible!important;clip:auto!important;clip-path:none!important;white-space:normal!important}';
 
         $css = sprintf(self::SIDE, implode('', $rules));
         if ($payload !== []) {

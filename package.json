@@ -1,7 +1,7 @@
 {
     "name": "uk.thequantum.carbon-theme",
     "private": true,
-    "version": "1.3.0",
+    "version": "2.0.0",
     "type": "module",
     "scripts": {
         "build": "vite build",
@@ -9,7 +9,10 @@
         "typecheck": "tsc",
         "test": "vitest run",
         "test:watch": "vitest",
-        "api:generate": "openapi-ts && node scripts/externalize-api.mjs"
+        "api:generate": "openapi-ts && node scripts/externalize-api.mjs",
+        "doctor": "php ../../artisan p:extension:doctor .",
+        "types": "php ../../artisan p:extension:types .",
+        "pack": "php ../../artisan p:extension:pack . --force"
     },
     "devDependencies": {
         "@pterodactyl/sdk": "file:../../packages/sdk",
@@ -34,6 +37,7 @@
         "@hey-api/openapi-ts": "0.99.0",
         "@types/node": "^22",
         "tailwindcss": "^4.3.0",
+        "@tailwindcss/forms": "^0.5.2",
         "@tailwindcss/postcss": "^4",
         "postcss": "^8.5.6"
     },

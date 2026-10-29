@@ -57,7 +57,8 @@ final class Typography
         }
 
         $faces = array_map(fn (array $face): string => sprintf(
-            "@font-face{font-family:'%s';src:url('/assets/theme/fonts/%s') format('%s');font-weight:%d;font-style:%s;font-display:swap}",
+            // Font files have unique names, so they need no revision.
+            "@font-face{font-family:'%s';src:url('/extensions/carbon-theme/files/fonts/%s') format('%s');font-weight:%d;font-style:%s;font-display:swap}",
             $face['family'],
             $face['file'],
             self::format($face['file']),

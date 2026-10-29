@@ -2,6 +2,7 @@ import { afterEach, expect, test } from 'vitest';
 import { drawGroupTitles, navGroups, tagFor } from './runtime';
 
 afterEach(() => {
+    window.history.replaceState(null, '', '/');
     document.body.innerHTML = '';
 });
 
@@ -10,12 +11,12 @@ function links(html: string): HTMLAnchorElement[] {
     return [...document.querySelectorAll('a')];
 }
 
-test('tags server tabs, including extension tabs after the core ones', () => {
+test('tags server tabs, including extension tabs', () => {
     const [console, files, votifier] = links(`
         <div>
-            <a data-core href="/server/a4302f3f"><span><span>Console</span></span></a>
-            <a data-core href="/server/a4302f3f/files#/"><span><span>Files</span></span></a>
-            <a href="/server/a4302f3f/votifier"><span><svg></svg><span>Votifier</span></span></a>
+            <a data-nav-item="core" href="/server/a4302f3f"><span><span>Console</span></span></a>
+            <a data-nav-item="core" href="/server/a4302f3f/files#/"><span><span>Files</span></span></a>
+            <a data-nav-item="votifier" href="/server/a4302f3f/votifier"><span><svg></svg><span>Votifier</span></span></a>
         </div>`);
 
     expect(tagFor(console)).toEqual(['server:console', 'tab']);
@@ -24,7 +25,7 @@ test('tags server tabs, including extension tabs after the core ones', () => {
 });
 
 test('tags account tabs and the admin sidebar', () => {
-    const [account, api] = links(`<div><a data-core href="/account">Account</a><a data-core href="/account/api">API</a></div>`);
+    const [account, api] = links(`<div><a data-nav-item="core" href="/account">Account</a><a data-nav-item="core" href="/account/api">API</a></div>`);
     expect(tagFor(account)).toEqual(['account:overview', 'tab']);
     expect(tagFor(api)).toEqual(['account:api', 'tab']);
 
@@ -55,10 +56,23 @@ test('tags only the header icon links and ignores other links', () => {
 test('tags the server admin link in the tab row', () => {
     const [, admin] = links(`
         <div>
-            <a data-core href="/server/a4302f3f"><span><span>Console</span></span></a>
-            <a aria-label="Open server administration" href="/panel/servers/1"><span><svg></svg><span>Open Admin Area</span></span></a>
+            <a data-nav-item="core" href="/server/a4302f3f"><span><span>Console</span></span></a>
+            <a data-nav-item="admin" aria-label="Open server administration" href="/panel/servers/1"><span><svg></svg><span>Open Admin Area</span></span></a>
         </div>`);
     expect(tagFor(admin)).toEqual(['server:admin-view', 'tab']);
+});
+
+test("leaves the admin area's server detail tabs alone, also while the URL already shows the next page", () => {
+    // The Panel changes the URL before the admin page leaves, so the page on show decides.
+    window.history.replaceState(null, '', '/server/a4302f3f');
+    const [about, details] = links(`
+        <div>
+            <nav id="admin-sidebar-nav"></nav>
+            <a data-nav-item="about" href="/panel/servers/1"><span>About</span></a>
+            <a data-nav-item="details" href="/panel/servers/1/details"><span>Details</span></a>
+        </div>`);
+    expect(tagFor(about)).toBeNull();
+    expect(tagFor(details)).toBeNull();
 });
 
 test('reads sidebar groups and draws a title for each group the user can see', () => {
@@ -73,8 +87,8 @@ test('reads sidebar groups and draws a title for each group the user can see', (
 
     document.body.innerHTML = `
         <div id="row">
-            <a data-core data-ct-route="server:console" href="/server/x"></a>
-            <a data-core data-ct-route="server:files" href="/server/x/files"></a>
+            <a data-nav-item="core" data-ct-route="server:console" href="/server/x"></a>
+            <a data-nav-item="core" data-ct-route="server:files" href="/server/x/files"></a>
         </div>`;
     const row = document.getElementById('row')!;
     drawGroupTitles(row, groups);

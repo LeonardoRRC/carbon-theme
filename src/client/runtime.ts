@@ -1,9 +1,25 @@
 /**
- * Runs on every page. The theme itself is the Panel's applied theme stylesheet
- * (/assets/theme.css, linked in the page head). This reads the layout it declares, tags
- * navigation links so it can give them icons, and draws the server sidebar's group titles.
+ * Runs on every page. Carbon's base stylesheet is the theme stylesheet the Panel links in the page
+ * head; the stylesheet built from the saved configuration is served by the extension and linked
+ * here. This reads the layout it declares, tags navigation links so it can give them icons, and
+ * draws the server sidebar's group titles.
  */
-const STYLESHEET = 'link[rel="stylesheet"][href^="/assets/theme.css"]';
+const STYLESHEET_URL = '/extensions/carbon-theme/theme.css';
+const STYLESHEET = 'link[rel="stylesheet"][data-carbon-theme]';
+
+/** Links the configured stylesheet once, before the Panel is revealed. */
+export function linkStylesheet(): HTMLLinkElement {
+    const existing = document.querySelector<HTMLLinkElement>(STYLESHEET);
+    if (existing) return existing;
+
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = STYLESHEET_URL;
+    link.dataset.carbonTheme = '';
+    document.head.appendChild(link);
+
+    return link;
+}
 
 function readVar(name: string): string {
     return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
@@ -17,8 +33,9 @@ export function onLayoutChange(listener: () => void): () => void {
     return () => layoutListeners.delete(listener);
 }
 
-export function consoleStyle(): 'panel' | 'carbon' {
-    return document.documentElement.dataset.ctConsoleStyle === 'carbon' ? 'carbon' : 'panel';
+export function consoleStyle(): 'panel' | 'carbon' | 'blocks' {
+    const style = document.documentElement.dataset.ctConsoleStyle;
+    return style === 'carbon' || style === 'blocks' ? style : 'panel';
 }
 
 export function filesStyle(): 'panel' | 'carbon' {
@@ -36,6 +53,27 @@ export function dashboardMode(): 'panel' | 'rows' | 'cards' {
 }
 
 /**
+ * The administration area, which keeps its own sidebar and draws its detail tabs as tabs. Read
+ * from the page on show rather than the URL: the Panel changes the URL first and keeps the old
+ * page up while its transition runs, which can take a few seconds.
+ */
+function inAdminArea(): boolean {
+    return typeof document !== 'undefined' && document.getElementById('admin-sidebar-nav') !== null;
+}
+
+/**
+ * The Panel draws every sub-navigation as a sidebar while <html data-sub-navigation="side"> is
+ * set. Carbon's side navigation is for server and account pages, so the admin area's resource
+ * tabs keep their row. Checked again on every page change.
+ */
+function syncSubNavigation(navigation = readVar('--ct-navigation')): void {
+    const root = document.documentElement;
+    const side = navigation === 'side' && !inAdminArea();
+    if (side && root.getAttribute('data-sub-navigation') !== 'side') root.setAttribute('data-sub-navigation', 'side');
+    else if (!side && root.hasAttribute('data-sub-navigation')) root.removeAttribute('data-sub-navigation');
+}
+
+/**
  * Applies the layout the stylesheet declares in --ct-navigation and --ct-dashboard. A
  * stylesheet cannot set the attributes the Panel's side navigation and the server cards key
  * off, so this does.
@@ -50,8 +88,7 @@ export function applyLayout(): void {
     const authStyle = readVar('--ct-auth') || 'panel';
     const hasLogo = readVar('--ct-logo') !== '';
 
-    if (navigation === 'side') root.setAttribute('data-sub-navigation', 'side');
-    else root.removeAttribute('data-sub-navigation');
+    syncSubNavigation(navigation);
     if (root.dataset.ctToasts !== toasts) root.dataset.ctToasts = toasts;
     if (hasLogo) root.dataset.ctLogo = '';
     else delete root.dataset.ctLogo;
@@ -74,7 +111,8 @@ export function reloadStylesheet(revision: number): Promise<void> {
     const current = document.querySelector<HTMLLinkElement>(STYLESHEET);
     const next = document.createElement('link');
     next.rel = 'stylesheet';
-    next.href = `/assets/theme.css?v=${revision}-${Date.now()}`;
+    next.href = `${STYLESHEET_URL}?v=${revision}-${Date.now()}`;
+    next.dataset.carbonTheme = '';
 
     return new Promise((resolve) => {
         const done = () => {
@@ -118,8 +156,8 @@ export function tagFor(link: HTMLAnchorElement): Tag | null {
         return path ? [`admin:${path}`, 'side'] : null;
     }
 
-    // Server and account tabs: core tabs carry data-core, extension tabs follow them.
-    if (link.parentElement?.querySelector(':scope > a[data-core]')) {
+    // Server and account tabs: every item of the Panel's sub-navigation carries data-nav-item.
+    if (link.hasAttribute('data-nav-item')) {
         if (parts[0] === 'server' && parts.length >= 2) {
             const path = join(parts.slice(2), 'console');
             return path ? [`server:${path}`, 'tab'] : null;
@@ -128,8 +166,11 @@ export function tagFor(link: HTMLAnchorElement): Tag | null {
             const path = join(parts.slice(1), 'overview');
             return path ? [`account:${path}`, 'tab'] : null;
         }
-        // The server's "Open Admin Area" link, shown to administrators.
-        if (parts[0] === 'panel' && parts[1] === 'servers') return ['server:admin-view', 'tab'];
+        // The server's "Open Admin Area" link, shown to administrators. In the admin area the
+        // server's own detail tabs (About, Details, Build...) link there too, and stay untagged.
+        if (parts[0] === 'panel' && parts[1] === 'servers' && parts.length === 3 && !inAdminArea()) {
+            return ['server:admin-view', 'tab'];
+        }
 
         return null;
     }
@@ -199,7 +240,8 @@ function mark(element: Element | null | undefined, part: ConsolePart): void {
  * stat tiles, and the charts. Found from the terminal, by structure rather than class names.
  */
 export function tagConsole(doc: ParentNode = document): void {
-    const terminal = doc.querySelector('.bg-terminal');
+    // Decorative previews, such as the console designs in Carbon's own editor, sit in aria-hidden markup.
+    const terminal = [...doc.querySelectorAll('.bg-terminal')].find((element) => !element.closest('[aria-hidden="true"]'));
     if (!terminal) return;
 
     // Climb to the row that holds the terminal: the first ancestor whose siblings include the header.
@@ -241,12 +283,14 @@ export function tagAuth(doc: ParentNode = document): void {
 }
 
 function tagAll(root: ParentNode): void {
+    // A page change re-renders the page, which lands here; the admin area keeps its tab row.
+    syncSubNavigation();
     tagConsole(root);
     tagAuth(root);
 
     const serverRows = new Set<Element>();
     for (const link of root.querySelectorAll<HTMLAnchorElement>(
-        '#admin-sidebar-nav a[href], a[data-core][href], a[data-core] ~ a[href], a[aria-label][href]',
+        '#admin-sidebar-nav a[href], a[data-nav-item][href], a[aria-label][href]',
     )) {
         const tag = tagFor(link);
         if (!tag) continue;
@@ -299,11 +343,13 @@ async function reveal(preload: Promise<unknown>[]): Promise<void> {
 
 export function start(preload: Promise<unknown>[] = []): void {
     if (observer) return;
+    // Linked before reveal() looks for pending stylesheets, so the Panel waits for it.
+    const stylesheet = linkStylesheet();
     if (typeof requestAnimationFrame !== 'undefined') void reveal(preload);
 
     applyLayout();
-    // The stylesheet may finish loading after setup on a slow connection.
-    document.querySelector<HTMLLinkElement>(STYLESHEET)?.addEventListener('load', applyLayout, { once: true });
+    // The stylesheet usually finishes loading after setup.
+    stylesheet.addEventListener('load', applyLayout, { once: true });
 
     observer = new MutationObserver(scheduleScan);
     observer.observe(document.documentElement, { childList: true, subtree: true, attributes: true, attributeFilter: ['href'] });

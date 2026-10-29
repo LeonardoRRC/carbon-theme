@@ -41,9 +41,9 @@ export default function IconEditor({ payload, draft, svgs, onChange, onSvg }: Pr
     const changed = Object.keys(draft.icons).length;
 
     return (
-        <div className={'ct:flex ct:flex-col ct:gap-6'}>
+        <div className={'flex flex-col gap-6'}>
             <TitledGreyBox title={'Navigation icons'}>
-                <div className={'ct:flex ct:flex-col ct:gap-4 ct:sm:flex-row ct:sm:items-center ct:sm:justify-between'}>
+                <div className={'flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'}>
                     <Switch
                         checked={draft.tab_icons}
                         onChange={(checked) => onChange({ ...draft, tab_icons: checked })}
@@ -64,7 +64,7 @@ export default function IconEditor({ payload, draft, svgs, onChange, onSvg }: Pr
 
                 return (
                     <TitledGreyBox key={area.id} title={area.title}>
-                        <p className={'ct:mb-4 ct:text-sm ct:text-muted-foreground'}>{area.description}</p>
+                        <p className={'mb-4 text-sm text-muted-foreground'}>{area.description}</p>
                         <Table
                             rows={rows}
                             keyOf={(route) => route.key}
@@ -76,7 +76,7 @@ export default function IconEditor({ payload, draft, svgs, onChange, onSvg }: Pr
                                     cell: (route) => {
                                         const { reference } = iconFor(route, draft);
                                         return (
-                                            <span className={'ct:flex ct:size-8 ct:items-center ct:justify-center ct:rounded-md ct:bg-muted ct:text-foreground'}>
+                                            <span className={'flex size-8 items-center justify-center rounded-md bg-muted text-foreground'}>
                                                 <IconGlyph svg={reference ? svgs[reference] : undefined} size={18} />
                                             </span>
                                         );
@@ -86,16 +86,16 @@ export default function IconEditor({ payload, draft, svgs, onChange, onSvg }: Pr
                                     id: 'route',
                                     label: 'Route',
                                     cell: (route) => (
-                                        <span className={'ct:flex ct:flex-col ct:gap-0.5'}>
-                                            <span className={'ct:flex ct:items-center ct:gap-2 ct:font-medium ct:text-foreground'}>
+                                        <span className={'flex flex-col gap-0.5'}>
+                                            <span className={'flex items-center gap-2 font-medium text-foreground'}>
                                                 {route.label}
                                                 {route.source !== 'Panel' && (
-                                                    <span className={'ct:rounded-full ct:bg-accent/15 ct:px-2 ct:py-0.5 ct:text-[11px] ct:font-normal ct:text-accent'}>
+                                                    <span className={'rounded-full bg-accent/15 px-2 py-0.5 text-[11px] font-normal text-accent'}>
                                                         {route.source}
                                                     </span>
                                                 )}
                                             </span>
-                                            <span className={'ct:font-mono ct:text-xs ct:text-muted-foreground'}>{route.path}</span>
+                                            <span className={'font-mono text-xs text-muted-foreground'}>{route.path}</span>
                                         </span>
                                     ),
                                 },
@@ -105,9 +105,9 @@ export default function IconEditor({ payload, draft, svgs, onChange, onSvg }: Pr
                                     cell: (route) => {
                                         const { reference, custom } = iconFor(route, draft);
                                         return (
-                                            <span className={'ct:flex ct:flex-col ct:gap-0.5 ct:text-xs'}>
-                                                <span className={'ct:font-mono ct:text-foreground'}>{reference ?? 'None'}</span>
-                                                <span className={'ct:text-muted-foreground'}>{custom ? 'Custom' : 'Default'}</span>
+                                            <span className={'flex flex-col gap-0.5 text-xs'}>
+                                                <span className={'font-mono text-foreground'}>{reference ?? 'None'}</span>
+                                                <span className={'text-muted-foreground'}>{custom ? 'Custom' : 'Default'}</span>
                                             </span>
                                         );
                                     },
@@ -116,7 +116,7 @@ export default function IconEditor({ payload, draft, svgs, onChange, onSvg }: Pr
                                     id: 'actions',
                                     label: '',
                                     cell: (route) => (
-                                        <span className={'ct:flex ct:justify-end ct:gap-2'}>
+                                        <span className={'flex justify-end gap-2'}>
                                             {draft.icons[route.key] && (
                                                 <Button.Text size={'xsmall'} onClick={() => setIcon(route.key, null)}>
                                                     Reset

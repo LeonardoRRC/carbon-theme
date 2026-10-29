@@ -26,8 +26,8 @@ function FontField({ role, font, payload, onChange }: { role: 'body' | 'heading'
     useEffect(() => setName(font.family ?? ''), [font.family, font.type]);
 
     return (
-        <div className={'ct:flex ct:flex-col ct:gap-4'}>
-            <div role={'radiogroup'} aria-label={`${role} font source`} className={'ct:grid ct:gap-2 ct:sm:grid-cols-2'}>
+        <div className={'flex flex-col gap-4'}>
+            <div role={'radiogroup'} aria-label={`${role} font source`} className={'grid gap-2 sm:grid-cols-2'}>
                 {SOURCES.map((source) => {
                     const selected = font.type === source.value;
                     const disabled = source.value === 'custom' && uploaded.length === 0;
@@ -40,20 +40,20 @@ function FontField({ role, font, payload, onChange }: { role: 'body' | 'heading'
                             disabled={disabled}
                             onClick={() => onChange(source.value === 'panel' ? { type: 'panel' } : { type: source.value, family: source.value === 'custom' ? uploaded[0] : font.type === source.value ? font.family : source.value === 'google' ? 'Inter' : '' })}
                             className={[
-                                'ct:flex ct:flex-col ct:gap-0.5 ct:rounded-md ct:border ct:px-3 ct:py-2 ct:text-left ct:transition-colors ct:disabled:opacity-50',
-                                selected ? 'ct:border-primary ct:bg-primary/10' : 'ct:border-border ct:bg-card ct:hover:bg-muted',
+                                'flex flex-col gap-0.5 rounded-md border px-3 py-2 text-left transition-colors disabled:opacity-50',
+                                selected ? 'border-primary bg-primary/10' : 'border-border bg-card hover:bg-muted',
                             ].join(' ')}
                         >
-                            <span className={'ct:text-sm ct:font-medium ct:text-foreground'}>{source.label}</span>
-                            <span className={'ct:text-xs ct:text-muted-foreground'}>{source.description}</span>
+                            <span className={'text-sm font-medium text-foreground'}>{source.label}</span>
+                            <span className={'text-xs text-muted-foreground'}>{source.description}</span>
                         </button>
                     );
                 })}
             </div>
 
             {font.type === 'google' && (
-                <div className={'ct:flex ct:flex-col ct:gap-2'}>
-                    <div className={'ct:flex ct:flex-wrap ct:gap-1.5'}>
+                <div className={'flex flex-col gap-2'}>
+                    <div className={'flex flex-wrap gap-1.5'}>
                         {payload.google_fonts.map((family) => (
                             <button
                                 key={family}
@@ -62,8 +62,8 @@ function FontField({ role, font, payload, onChange }: { role: 'body' | 'heading'
                                 style={{ fontFamily: `'${family}', system-ui` }}
                                 onMouseEnter={() => loadFontForPreview({ type: 'google', family }, [], 0)}
                                 className={[
-                                    'ct:rounded-full ct:border ct:px-3 ct:py-1 ct:text-sm ct:transition-colors',
-                                    font.family === family ? 'ct:border-primary ct:bg-primary/15 ct:text-foreground' : 'ct:border-border ct:text-muted-foreground ct:hover:text-foreground',
+                                    'rounded-full border px-3 py-1 text-sm transition-colors',
+                                    font.family === family ? 'border-primary bg-primary/15 text-foreground' : 'border-border text-muted-foreground hover:text-foreground',
                                 ].join(' ')}
                             >
                                 {family}
@@ -74,7 +74,7 @@ function FontField({ role, font, payload, onChange }: { role: 'body' | 'heading'
             )}
 
             {(font.type === 'google' || font.type === 'system') && (
-                <div className={'ct:flex ct:flex-col ct:gap-2'}>
+                <div className={'flex flex-col gap-2'}>
                     <Label htmlFor={`ct-font-${role}`}>{font.type === 'google' ? 'Or type any Google Fonts family' : 'Font name'}</Label>
                     <Input
                         id={`ct-font-${role}`}
@@ -88,7 +88,7 @@ function FontField({ role, font, payload, onChange }: { role: 'body' | 'heading'
             )}
 
             {font.type === 'custom' && (
-                <div className={'ct:flex ct:flex-col ct:gap-2'}>
+                <div className={'flex flex-col gap-2'}>
                     <Label htmlFor={`ct-font-${role}`}>Uploaded family</Label>
                     <Select
                         id={`ct-font-${role}`}
@@ -130,23 +130,23 @@ function UploadedFonts({ payload, onUploaded }: { payload: ThemePayload; onUploa
 
     return (
         <TitledGreyBox title={'Uploaded fonts'}>
-            <p className={'ct:mb-4 ct:text-sm ct:text-muted-foreground'}>
+            <p className={'mb-4 text-sm text-muted-foreground'}>
                 Upload one file per weight and style: WOFF2, WOFF, TTF, or OTF, up to 3 MB each, {payload.max_fonts} files at most. Make sure the font’s license allows web use.
             </p>
-            <div className={'ct:flex ct:flex-col ct:gap-4'}>
+            <div className={'flex flex-col gap-4'}>
                 <Table
                     rows={fonts}
                     keyOf={(font) => font.id}
                     emptyState={'No uploaded fonts yet.'}
                     columns={[
-                        { id: 'family', label: 'Family', cell: (font) => <span className={'ct:font-medium ct:text-foreground'}>{font.family}</span> },
+                        { id: 'family', label: 'Family', cell: (font) => <span className={'font-medium text-foreground'}>{font.family}</span> },
                         { id: 'weight', label: 'Weight', cell: (font) => `${font.weight}${font.style === 'italic' ? ' italic' : ''}` },
-                        { id: 'file', label: 'File', cell: (font) => <span className={'ct:font-mono ct:text-xs'}>{font.file.split('.').pop()?.toUpperCase()}</span> },
+                        { id: 'file', label: 'File', cell: (font) => <span className={'font-mono text-xs'}>{font.file.split('.').pop()?.toUpperCase()}</span> },
                         {
                             id: 'actions',
                             label: '',
                             cell: (font) => (
-                                <span className={'ct:flex ct:justify-end'}>
+                                <span className={'flex justify-end'}>
                                     <Button.Text size={'xsmall'} disabled={remove.isPending} onClick={() => remove.mutate(font.id)}>
                                         Remove
                                     </Button.Text>
@@ -155,14 +155,14 @@ function UploadedFonts({ payload, onUploaded }: { payload: ThemePayload; onUploa
                         },
                     ]}
                 />
-                <div className={'ct:grid ct:items-end ct:gap-3 ct:sm:grid-cols-2 ct:lg:grid-cols-[1.4fr_1.2fr_0.8fr_0.8fr_auto]'}>
-                    <div className={'ct:flex ct:flex-col ct:gap-2'}>
+                <div className={'grid items-end gap-3 sm:grid-cols-2 lg:grid-cols-[1.4fr_1.2fr_0.8fr_0.8fr_auto]'}>
+                    <div className={'flex flex-col gap-2'}>
                         <Label>File</Label>
                         <input
                             ref={input}
                             type={'file'}
                             accept={'.woff2,.woff,.ttf,.otf'}
-                            className={'ct:hidden'}
+                            className={'hidden'}
                             onChange={(event) => {
                                 const chosen = event.target.files?.[0] ?? null;
                                 setFile(chosen);
@@ -171,18 +171,18 @@ function UploadedFonts({ payload, onUploaded }: { payload: ThemePayload; onUploa
                             }}
                         />
                         <Button isSecondary onClick={() => input.current?.click()}>
-                            <span className={'ct:block ct:max-w-48 ct:truncate'}>{file ? file.name : 'Choose file'}</span>
+                            <span className={'block max-w-48 truncate'}>{file ? file.name : 'Choose file'}</span>
                         </Button>
                     </div>
-                    <div className={'ct:flex ct:flex-col ct:gap-2'}>
+                    <div className={'flex flex-col gap-2'}>
                         <Label htmlFor={'ct-upload-family'}>Family name</Label>
                         <Input id={'ct-upload-family'} value={family} placeholder={'My Font'} onChange={(event) => setFamily(event.target.value)} />
                     </div>
-                    <div className={'ct:flex ct:flex-col ct:gap-2'}>
+                    <div className={'flex flex-col gap-2'}>
                         <Label htmlFor={'ct-upload-weight'}>Weight</Label>
                         <Select id={'ct-upload-weight'} value={weight} options={WEIGHTS.map((w) => ({ value: w, label: String(w) }))} onChange={(value) => setWeight(Number(value))} />
                     </div>
-                    <div className={'ct:flex ct:flex-col ct:gap-2'}>
+                    <div className={'flex flex-col gap-2'}>
                         <Label htmlFor={'ct-upload-style'}>Style</Label>
                         <Select
                             id={'ct-upload-style'}
@@ -214,8 +214,8 @@ export default function TypographyEditor({ payload, draft, onChange, onUploaded 
     const setFont = (role: 'body' | 'heading', font: FontRef) => onChange({ ...draft, fonts: { ...draft.fonts, [role]: font } });
 
     return (
-        <div className={'ct:flex ct:flex-col ct:gap-6'}>
-            <div className={'ct:grid ct:items-start ct:gap-6 ct:xl:grid-cols-3'}>
+        <div className={'flex flex-col gap-6'}>
+            <div className={'grid items-start gap-6 xl:grid-cols-3'}>
                 <TitledGreyBox title={'Body text'}>
                     <FontField role={'body'} font={draft.fonts.body} payload={payload} onChange={(font) => setFont('body', font)} />
                 </TitledGreyBox>
@@ -223,14 +223,14 @@ export default function TypographyEditor({ payload, draft, onChange, onUploaded 
                     <FontField role={'heading'} font={draft.fonts.heading} payload={payload} onChange={(font) => setFont('heading', font)} />
                 </TitledGreyBox>
                 <TitledGreyBox title={'Preview'}>
-                    <div className={'ct:flex ct:flex-col ct:gap-3'}>
-                        <p className={'ct:text-2xl ct:font-semibold ct:text-foreground'} style={{ fontFamily: fontStack(draft.fonts.heading) ?? undefined }}>
+                    <div className={'flex flex-col gap-3'}>
+                        <p className={'text-2xl font-semibold text-foreground'} style={{ fontFamily: fontStack(draft.fonts.heading) ?? undefined }}>
                             Survival Network
                         </p>
-                        <p className={'ct:text-sm ct:leading-relaxed ct:text-muted-foreground'} style={{ fontFamily: fontStack(draft.fonts.body) ?? undefined }}>
+                        <p className={'text-sm leading-relaxed text-muted-foreground'} style={{ fontFamily: fontStack(draft.fonts.body) ?? undefined }}>
                             The quick brown fox jumps over the lazy dog. 0123456789. Your server is online and ready for players.
                         </p>
-                        <p className={'ct:text-xs ct:text-muted-foreground'}>
+                        <p className={'text-xs text-muted-foreground'}>
                             The whole Panel previews your choice too. Google fonts load from fonts.googleapis.com.
                         </p>
                     </div>

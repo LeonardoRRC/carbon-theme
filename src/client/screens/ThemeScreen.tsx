@@ -149,16 +149,16 @@ export default function ThemeScreen() {
 
     return (
         <PageContentBlock title={'Carbon Theme'}>
-            <div className={'ct:flex ct:flex-col ct:gap-6'}>
-                <div className={'ct:flex ct:flex-col ct:gap-4 ct:md:flex-row ct:md:items-end ct:md:justify-between'}>
-                    <div className={'ct:flex ct:flex-col ct:gap-1'}>
-                        <h1 className={'ct:font-header ct:text-2xl ct:font-medium ct:text-foreground'}>Carbon Theme</h1>
-                        <p className={'ct:text-sm ct:text-muted-foreground'}>
+            <div className={'flex flex-col gap-6'}>
+                <div className={'flex flex-col gap-4 md:flex-row md:items-end md:justify-between'}>
+                    <div className={'flex flex-col gap-1'}>
+                        <h1 className={'font-header text-2xl font-medium text-foreground'}>Carbon Theme</h1>
+                        <p className={'text-sm text-muted-foreground'}>
                             Colors, layout, fonts, and branding for every user. Changes preview here and apply to everyone when saved.
                         </p>
                     </div>
-                    <div className={'ct:flex ct:items-center ct:gap-2'}>
-                        {dirty && <span className={'ct:mr-2 ct:text-xs ct:text-warning'}>Unsaved changes</span>}
+                    <div className={'flex items-center gap-2'}>
+                        {dirty && <span className={'mr-2 text-xs text-warning'}>Unsaved changes</span>}
                         <Button isSecondary disabled={!dirty || save.isPending} onClick={() => setDraft(toDraft(theme.data))}>
                             Discard
                         </Button>
@@ -168,7 +168,7 @@ export default function ThemeScreen() {
                     </div>
                 </div>
 
-                <div role={'tablist'} aria-label={'Theme settings'} className={'ct:flex ct:gap-1 ct:overflow-x-auto ct:border-b ct:border-border'}>
+                <div role={'tablist'} aria-label={'Theme settings'} className={'flex gap-1 overflow-x-auto border-b border-border'}>
                     {TABS.map((item) => (
                         <button
                             key={item.id}
@@ -177,11 +177,11 @@ export default function ThemeScreen() {
                             aria-selected={tab === item.id}
                             onClick={() => setTab(item.id)}
                             className={[
-                                'ct:-mb-px ct:flex ct:shrink-0 ct:items-center ct:gap-2 ct:border-b-2 ct:px-4 ct:py-2.5 ct:text-sm ct:whitespace-nowrap ct:transition-colors',
-                                tab === item.id ? 'ct:border-primary ct:text-foreground' : 'ct:border-transparent ct:text-muted-foreground ct:hover:text-foreground',
+                                '-mb-px flex shrink-0 items-center gap-2 border-b-2 px-4 py-2.5 text-sm whitespace-nowrap transition-colors',
+                                tab === item.id ? 'border-primary text-foreground' : 'border-transparent text-muted-foreground hover:text-foreground',
                             ].join(' ')}
                         >
-                            <NamedIcon name={item.icon} className={'ct:size-4'} />
+                            <NamedIcon name={item.icon} className={'size-4'} />
                             {item.label}
                         </button>
                     ))}

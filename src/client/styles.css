@@ -1,7 +1,31 @@
-@import 'tailwindcss/theme.css' layer(theme) prefix(ct);
-@import 'tailwindcss/utilities.css' layer(utilities) prefix(ct);
-@import '@pterodactyl/sdk/theme.css';
+/*
+ * Carbon's theme stylesheet, linked by the Panel in the page head: the Panel stylesheet with the
+ * classes Carbon's screens use, then Carbon's hand-written rules. The colours, fonts, layout,
+ * icons, and branding chosen in the editor come from the stylesheet the extension builds from its
+ * saved configuration (/extensions/carbon-theme/theme.css), which the frontend links after this.
+ */
+@import '@pterodactyl/sdk/theme-entry.css';
 @source './**/*.{ts,tsx}';
+
+/*
+ * The Panel draws its own layout before Carbon has tagged it and its configured stylesheet has
+ * loaded. This keeps it hidden until the runtime marks <html data-ct-ready>, and shows it anyway
+ * after 2.5s if it never does.
+ */
+:root:not([data-ct-ready]) #app {
+    opacity: 0;
+    animation: ct-reveal 0s 2.5s forwards;
+}
+
+#app {
+    transition: opacity 0.12s ease-out;
+}
+
+@keyframes ct-reveal {
+    to {
+        opacity: 1;
+    }
+}
 
 /*
  * Hand-written rules for markup the Panel renders, outside Tailwind's layers. Every class is
@@ -31,8 +55,15 @@
 
 /* ---------- Dashboard server card: rows ---------- */
 
-a:has(.ct-card) > .status-bar {
-    display: none;
+/* The Panel's status bar: Carbon shows the state as a badge instead (1.x and 2.0 markup). */
+a:has(.ct-card) > .status-bar,
+a:has(.ct-card) > [data-part='status'] {
+    display: none !important;
+}
+
+/* Rows: a little air between servers. */
+a:has(.ct-card) + a:has(.ct-card) {
+    margin-top: 0.75rem !important;
 }
 
 a:has(.ct-card) {
@@ -233,7 +264,7 @@ a:has(.ct-card):hover {
 :root[data-ct-dashboard='cards'] div:has(> a .ct-card) {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(19rem, 1fr));
-    gap: 1rem;
+    gap: 1.25rem;
     align-items: stretch;
 }
 
@@ -294,11 +325,22 @@ a:has(.ct-card):hover {
     letter-spacing: -0.01em;
 }
 
+/*
+ * The status above the power buttons, centred in the card. On Panel 2.0 both sit in the
+ * server.power view's own wrapper inside the column, so that wrapper is the stack too.
+ */
 :root[data-ct-console-style='carbon'] [data-ct-console='header'] > :last-child {
-    align-self: center;
+    align-self: center !important;
     display: flex;
     flex-direction: column;
-    gap: 0.625rem;
+    justify-content: center;
+    gap: 0.75rem;
+}
+
+:root[data-ct-console-style='carbon'] [data-ct-console='header'] > :last-child > div:has(> .ct-console-status) {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
 }
 
 .ct-console-status {
@@ -366,7 +408,16 @@ a:has(.ct-card):hover {
 :root[data-ct-console-style='carbon'] [data-ct-console='main'] {
     display: flex !important;
     flex-direction: column;
-    gap: 1rem;
+    gap: 1.25rem !important;
+    margin-bottom: 1.25rem !important;
+}
+
+:root[data-ct-console-style='carbon'] [data-ct-console='header'] {
+    margin-bottom: 1.25rem !important;
+}
+
+:root[data-ct-console-style='carbon'] [data-ct-console='charts'] {
+    gap: 1.25rem !important;
 }
 
 /* Two rows of four on wide screens: the address takes two columns so it is not cut off. */
@@ -374,7 +425,7 @@ a:has(.ct-card):hover {
     order: -1;
     display: grid !important;
     grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-    gap: 0.75rem !important;
+    gap: 1rem !important;
 }
 
 @media (width >= 48rem) {
@@ -386,8 +437,8 @@ a:has(.ct-card):hover {
 :root[data-ct-console-style='carbon'] [data-ct-console='stats'] > * {
     grid-column: auto !important;
     min-width: 0;
-    gap: 0.75rem;
-    padding: 0.75rem 0.875rem !important;
+    gap: 0.875rem;
+    padding: 1rem 1.125rem !important;
     border: 1px solid var(--border);
     border-radius: calc(var(--radius) * 1.4);
     background: var(--card);
@@ -398,19 +449,64 @@ a:has(.ct-card):hover {
     grid-column: span 2 !important;
 }
 
-:root[data-ct-console-style='carbon'] [data-ct-console='stats'] > * > .absolute {
-    display: none;
+/*
+ * Each tile is the Panel's Stat primitive (data-ui="stat"), whose parts carry data-part and whose
+ * root carries its tone. Every icon gets the same tinted badge: the accent, or the alarm's colour.
+ */
+:root[data-ct-console-style='carbon'] [data-ct-console='stats'] [data-ui='stat'][data-part='root'] {
+    --ct-stat-tone: var(--primary);
+    display: flex !important;
+    align-items: center;
 }
 
-:root[data-ct-console-style='carbon'] [data-ct-console='stats'] > * > div:nth-child(2) {
+:root[data-ct-console-style='carbon'] [data-ct-console='stats'] [data-ui='stat'][data-tone='danger'] {
+    --ct-stat-tone: var(--destructive);
+}
+
+:root[data-ct-console-style='carbon'] [data-ct-console='stats'] [data-ui='stat'][data-tone='warning'] {
+    --ct-stat-tone: var(--warning);
+}
+
+:root[data-ct-console-style='carbon'] [data-ct-console='stats'] [data-ui='stat'][data-tone='success'] {
+    --ct-stat-tone: var(--success);
+}
+
+:root[data-ct-console-style='carbon'] [data-ct-console='stats'] [data-ui='stat'][data-part='indicator'] {
+    display: none !important;
+}
+
+:root[data-ct-console-style='carbon'] [data-ct-console='stats'] [data-ui='stat'][data-part='icon'] {
+    display: flex !important;
+    flex: none;
     width: 2.25rem !important;
     height: 2.25rem !important;
     margin: 0 !important;
     border-radius: 999px !important;
+    background: color-mix(in oklab, var(--ct-stat-tone) 16%, transparent) !important;
     box-shadow: none !important;
 }
 
-:root[data-ct-console-style='carbon'] [data-ct-console='stats'] p {
+:root[data-ct-console-style='carbon'] [data-ct-console='stats'] [data-ui='stat'][data-part='glyph'] {
+    width: 1.05rem !important;
+    height: 1.05rem !important;
+    color: var(--ct-stat-tone) !important;
+}
+
+/* The Panel wraps the body and centres its lines; as a column that would centre the text. */
+:root[data-ct-console-style='carbon'] [data-ct-console='stats'] [data-ui='stat'][data-part='body'] {
+    display: flex !important;
+    flex-direction: column;
+    flex: 1;
+    flex-wrap: nowrap !important;
+    align-content: flex-start !important;
+    align-items: flex-start !important;
+    text-align: left;
+    gap: 0.125rem;
+    min-width: 0;
+}
+
+:root[data-ct-console-style='carbon'] [data-ct-console='stats'] [data-ui='stat'][data-part='label'] {
+    margin: 0 !important;
     font-family: var(--font-sans);
     font-size: 0.6875rem !important;
     font-weight: 600;
@@ -419,10 +515,36 @@ a:has(.ct-card):hover {
     color: var(--muted-foreground) !important;
 }
 
-:root[data-ct-console-style='carbon'] [data-ct-console='stats'] p + div {
+:root[data-ct-console-style='carbon'] [data-ct-console='stats'] [data-ui='stat'][data-part='value'] {
+    max-width: 100%;
+    margin: 0 !important;
+    overflow: hidden;
     font-size: 1rem !important;
-    line-height: 1.6rem !important;
-    height: 1.6rem !important;
+    font-weight: 600;
+    line-height: 1.5rem !important;
+    color: var(--foreground) !important;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* The value and its limit share a line, as in the Panel: "225 MiB / 4.88 GiB". */
+:root[data-ct-console-style='carbon'] [data-ct-console='stats'] [data-ui='stat'][data-part='body']:has([data-part='limit']) {
+    flex-flow: row wrap !important;
+    align-items: baseline !important;
+    column-gap: 0.375rem;
+}
+
+:root[data-ct-console-style='carbon'] [data-ct-console='stats'] [data-ui='stat'][data-part='body']:has([data-part='limit']) [data-part='label'] {
+    flex-basis: 100%;
+}
+
+:root[data-ct-console-style='carbon'] [data-ct-console='stats'] [data-ui='stat'][data-part='limit'] {
+    font-size: 0.75rem;
+    color: var(--muted-foreground);
+}
+
+:root[data-ct-console-style='carbon'] [data-ct-console='stats'] [data-ui='stat'][data-unavailable] [data-part='value'] {
+    color: var(--muted-foreground) !important;
 }
 
 /* The terminal as a window, with a title bar. */
@@ -491,12 +613,243 @@ a:has(.ct-card):hover {
     width: 100% !important;
 }
 
+/* ---------- Server console: Blocks style ----------
+ * ConsoleBlocks draws the page and the stat blocks; the Panel's terminal, power buttons, and
+ * charts are restyled here. Everything below applies only with <html data-ct-console-style="blocks">.
+ */
+
+.ct-blocks-page {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.ct-blocks-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem 1.5rem;
+}
+
+.ct-blocks-title {
+    min-width: 0;
+}
+
+.ct-blocks-title h1 {
+    overflow: hidden;
+    font-family: var(--font-header);
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--foreground);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.ct-blocks-title p {
+    margin-top: 0.125rem;
+    font-size: 0.875rem;
+    color: var(--muted-foreground);
+}
+
+/* Six blocks on wide screens, three on tablets, two on phones. */
+.ct-blocks {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+}
+
+@media (width >= 48rem) {
+    .ct-blocks {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+@media (width >= 80rem) {
+    .ct-blocks {
+        grid-template-columns: repeat(6, minmax(0, 1fr));
+    }
+}
+
+.ct-block {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-width: 0;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    border-radius: calc(var(--radius) * 1.4);
+    background: var(--card);
+}
+
+.ct-block-head {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.55rem 0.85rem;
+    background: var(--primary);
+    color: var(--primary-foreground);
+    font-family: var(--font-header);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.ct-block-head svg {
+    width: 1rem;
+    height: 1rem;
+    flex: none;
+}
+
+.ct-block-body {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    min-width: 0;
+    padding: 0.7rem 0.85rem;
+    overflow: hidden;
+    font-weight: 600;
+    color: var(--foreground);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.ct-block-mono {
+    overflow: hidden;
+    font-family: var(--font-mono, ui-monospace, monospace);
+    text-overflow: ellipsis;
+}
+
+.ct-block-limit {
+    font-weight: 400;
+    color: var(--muted-foreground);
+}
+
+.ct-block-usage[data-alarm='danger'] {
+    color: var(--destructive);
+}
+
+.ct-block-usage[data-alarm='warning'] {
+    color: var(--warning);
+}
+
+.ct-block-status {
+    --ct-tone: var(--muted-foreground);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-transform: uppercase;
+}
+
+.ct-block-status[data-tone='success'] {
+    --ct-tone: var(--success);
+}
+
+.ct-block-status[data-tone='warning'] {
+    --ct-tone: var(--warning);
+}
+
+.ct-block-status[data-tone='danger'] {
+    --ct-tone: var(--destructive);
+}
+
+.ct-block-status i {
+    width: 0.625rem;
+    height: 0.625rem;
+    flex: none;
+    border-radius: 50%;
+    background: var(--ct-tone);
+    box-shadow: 0 0 0 3px color-mix(in oklab, var(--ct-tone) 25%, transparent);
+}
+
+.ct-block-copy {
+    min-width: 0;
+    cursor: pointer;
+}
+
+.ct-block-copy:hover .ct-block {
+    border-color: color-mix(in oklab, var(--primary) 55%, var(--border));
+}
+
+/* Power buttons beside the name, in the theme's shape. */
+:root[data-ct-console-style='blocks'] .ct-blocks-header button {
+    border-radius: calc(var(--radius) * 1.2) !important;
+    text-transform: none !important;
+    letter-spacing: 0 !important;
+    font-weight: 600;
+}
+
+/* The terminal across the page, framed like the blocks. */
+.ct-blocks-terminal {
+    overflow: hidden;
+    border: 1px solid var(--border);
+    border-radius: calc(var(--radius) * 1.4);
+    background: var(--terminal-background, var(--card));
+}
+
+.ct-blocks-terminal > * {
+    width: 100%;
+}
+
+.ct-blocks-terminal div.bg-terminal {
+    min-height: 26rem;
+    border-radius: 0 !important;
+}
+
+.ct-blocks-terminal input {
+    border-width: 1px 0 0 !important;
+    border-color: var(--border) !important;
+    border-radius: 0 !important;
+}
+
+/* On phones the Panel widens the terminal past the page edges; inside the frame it stays in. */
+.ct-blocks-terminal > div > div {
+    margin-left: 0 !important;
+    width: 100% !important;
+}
+
+/* The charts under the same accent band as the blocks. */
+.ct-blocks-graphs {
+    gap: 1.25rem !important;
+}
+
+.ct-blocks-graphs [data-ui='chart-card'][data-part='root'] {
+    overflow: hidden;
+    padding-top: 0 !important;
+    border: 1px solid var(--border) !important;
+    border-radius: calc(var(--radius) * 1.4) !important;
+    background: var(--card) !important;
+    box-shadow: none !important;
+}
+
+.ct-blocks-graphs [data-ui='chart-card'][data-part='header'] {
+    margin-bottom: 0.5rem;
+    padding: 0.55rem 0.85rem !important;
+    background: var(--primary);
+    color: var(--primary-foreground);
+}
+
+.ct-blocks-graphs [data-ui='chart-card'][data-part='title'] {
+    font-family: var(--font-header);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: inherit !important;
+}
+
+.ct-blocks-graphs [data-ui='chart-card'][data-part='legend'] svg {
+    color: inherit !important;
+}
+
 /* ---------- File manager: Carbon style ---------- */
 
 .ct-files {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: 1.25rem;
 }
 
 .ct-files-head {

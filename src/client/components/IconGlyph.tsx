@@ -7,7 +7,7 @@ export default function IconGlyph({ svg, size = 16, className }: { svg?: string;
         return (
             <span
                 aria-hidden
-                className={['ct:inline-block ct:shrink-0 ct:rounded-sm ct:border ct:border-dashed ct:border-border', className].join(' ')}
+                className={['inline-block shrink-0 rounded-sm border border-dashed border-border', className].join(' ')}
                 style={{ width: size, height: size }}
             />
         );
@@ -18,7 +18,7 @@ export default function IconGlyph({ svg, size = 16, className }: { svg?: string;
     return (
         <span
             aria-hidden
-            className={['ct:inline-block ct:shrink-0 ct:bg-current', className].join(' ')}
+            className={['inline-block shrink-0 bg-current', className].join(' ')}
             style={{ width: size, height: size, mask, WebkitMask: mask }}
         />
     );

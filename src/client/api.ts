@@ -8,7 +8,7 @@ export interface LayoutConfig {
     sidebar_width: number;
     dashboard: 'panel' | 'rows' | 'cards';
     toasts: 'panel' | 'carbon';
-    console: 'panel' | 'carbon';
+    console: 'panel' | 'carbon' | 'blocks';
     files: 'panel' | 'carbon';
     auth: 'panel' | 'centered' | 'split';
 }
@@ -128,7 +128,8 @@ export interface ThemeUpdate {
 export const themeQueryKey = ['carbon-theme', 'config'] as const;
 
 /** URL of an uploaded file as the published theme serves it. */
-export const assetUrl = (folder: 'brand' | 'fonts', file: string, revision: number) => `/assets/theme/${folder}/${file}?v=${revision}`;
+export const assetUrl = (folder: 'brand' | 'fonts', file: string, revision: number) =>
+    `/extensions/carbon-theme/files/${folder}/${encodeURIComponent(file)}?v=${revision}`;
 
 export async function getTheme(): Promise<ThemePayload> {
     const { data } = await http.get<ThemePayload>(`${base}/config`);

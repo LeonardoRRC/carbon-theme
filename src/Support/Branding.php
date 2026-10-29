@@ -7,12 +7,19 @@ use Illuminate\Support\Facades\File;
 use Illuminate\Validation\ValidationException;
 
 /**
- * Uploaded logo, favicon, and font files. The originals live in storage/app/carbon-theme so
- * they survive Panel updates; publishing copies them into the theme's web assets
- * (/assets/theme/brand and /assets/theme/fonts).
+ * Uploaded logo, favicon, and font files. They live in storage/app/carbon-theme so they
+ * survive Panel updates, and the extension serves them at /extensions/carbon-theme/files.
  */
 final class Branding
 {
+    public const FOLDERS = ['brand', 'fonts'];
+
+    /** Where the extension serves an uploaded file; the revision busts browser caches after a change. */
+    public static function url(string $folder, string $file, int $revision): string
+    {
+        return sprintf('/extensions/carbon-theme/files/%s/%s?v=%d', $folder, rawurlencode($file), $revision);
+    }
+
     public const LOGO_MODES = ['logo', 'logo-name', 'name'];
 
     private const LOGO_TYPES = ['png', 'jpg', 'jpeg', 'webp', 'svg'];
@@ -84,7 +91,7 @@ final class Branding
             return '';
         }
 
-        $url = sprintf("url('/assets/theme/brand/%s?v=%d')", $logo['file'], $revision);
+        $url = sprintf("url('%s')", self::url('brand', $logo['file'], $revision));
         $ratio = max(0.2, min(8.0, (float) $logo['ratio']));
         $mode = in_array($branding['logo_mode'] ?? '', self::LOGO_MODES, true) ? $branding['logo_mode'] : 'logo-name';
 
@@ -115,7 +122,7 @@ final class Branding
         if ($favicon === null) {
             return [];
         }
-        $href = sprintf('/assets/theme/brand/%s?v=%d', $favicon['file'], $revision);
+        $href = self::url('brand', $favicon['file'], $revision);
 
         return [
             ['tag' => 'link', 'rel' => 'icon', 'type' => $favicon['type'], 'href' => $href],

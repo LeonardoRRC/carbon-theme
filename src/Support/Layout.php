@@ -21,8 +21,11 @@ final class Layout
 
     public const TOASTS = ['panel', 'carbon'];
 
-    /** "panel" keeps the Panel's console page; "carbon" restyles it (see the extension stylesheet). */
-    public const CONSOLE = ['panel', 'carbon'];
+    /**
+     * "panel" keeps the Panel's console page; "carbon" restyles it (see the extension stylesheet);
+     * "blocks" rebuilds it as a row of titled stat blocks over a full-width terminal and charts.
+     */
+    public const CONSOLE = ['panel', 'carbon', 'blocks'];
 
     /** "panel" keeps the Panel's file manager; "carbon" uses the extension's file manager and row replacements. */
     public const FILES = ['panel', 'carbon'];

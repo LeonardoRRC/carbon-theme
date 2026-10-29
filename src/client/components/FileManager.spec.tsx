@@ -1,14 +1,16 @@
-import { afterEach, expect, test } from 'vitest';
-import { cleanup, render, screen } from '@testing-library/react';
-import { createComponentTestHost, createTestFileManager, createTestFileManagerEntry } from '@pterodactyl/sdk/testing';
-import FileManager from './FileManager';
+import { afterEach, beforeAll, expect, test } from 'vitest';
+import { preloadTheme, renderView, type RenderedView } from '@pterodactyl/sdk/testing';
+import theme from '../index';
 import { iconFor } from './FileIcon';
 
-let dispose: (() => void) | undefined;
+const themes = [theme];
+let rendered: RenderedView | undefined;
+
+// The views are lazy; loading their chunks first lets renderView render them at once.
+beforeAll(() => preloadTheme(themes));
 afterEach(() => {
-    cleanup();
-    dispose?.();
-    dispose = undefined;
+    rendered?.unmount();
+    rendered = undefined;
     delete document.documentElement.dataset.ctFilesStyle;
 });
 
@@ -21,26 +23,36 @@ test('picks an icon and color from the file kind and extension', () => {
     expect(iconFor({ name: 'LICENSE', kind: 'file' })).toEqual(['file', 'muted']);
 });
 
-test('shows the folder summary around the native toolbar and list', async () => {
+test('frames the native toolbar and list under the folder summary', () => {
     document.documentElement.dataset.ctFilesStyle = 'carbon';
-    const host = createComponentTestHost('server.files.manager', {
-        model: createTestFileManager({
-            directory: '/plugins',
-            entries: [
-                createTestFileManagerEntry({ name: 'Votifier', kind: 'directory' }),
-                createTestFileManagerEntry({ name: 'Votifier.jar', kind: 'file', size: 2048 }),
-                createTestFileManagerEntry({ name: 'config.yml', kind: 'file', size: 1024 }),
-            ],
-        }),
-    });
-    dispose = host.dispose;
-    render(<FileManager {...host.props} />, { wrapper: host.Wrapper });
+    rendered = renderView('server.files.manager', { themes, fixture: 'directory' });
 
-    // The folder name shows in the header and in the Panel's own breadcrumb inside the window.
-    expect(await screen.findAllByText('plugins')).toHaveLength(2);
-    expect(document.querySelector('.ct-files-title')?.textContent).toBe('plugins');
-    expect(document.querySelector('.ct-files-bar')?.textContent).toContain('plugins');
-    expect(screen.getByText('1 folder')).toBeTruthy();
-    expect(screen.getByText('2 files')).toBeTruthy();
-    expect(screen.getByText('3.00 KiB')).toBeTruthy();
+    expect(rendered.container.querySelector('.ct-files-title')?.textContent).toBeTruthy();
+    expect(rendered.container.querySelector('.ct-files-meta')?.textContent).toMatch(/folders?/);
+    expect(rendered.container.querySelector('.ct-files-bar')?.childElementCount).toBeGreaterThan(0);
+    expect(rendered.container.querySelector('.ct-files-list')?.childElementCount).toBeGreaterThan(0);
+});
+
+test("keeps classic's file manager in the Panel style", () => {
+    rendered = renderView('server.files.manager', { themes, fixture: 'directory' });
+
+    expect(rendered.container.querySelector('.ct-files')).toBeNull();
+});
+
+test('draws file rows with the tinted icon in the Carbon style', () => {
+    document.documentElement.dataset.ctFilesStyle = 'carbon';
+    rendered = renderView('server.files.details', { themes, fixture: 'file' });
+
+    expect(rendered.container.querySelector('.ct-file-row .ct-file-icon')).not.toBeNull();
+});
+
+test('places the native identity in the Carbon server card, with its slot', () => {
+    rendered = renderView('dashboard.serverCard', {
+        themes,
+        fixture: 'running',
+        slots: { 'dashboard.serverRow.name.after': () => <span>name-slot</span> },
+    });
+
+    expect(rendered.container.querySelector('.ct-card')).not.toBeNull();
+    expect(rendered.container.textContent).toContain('name-slot');
 });

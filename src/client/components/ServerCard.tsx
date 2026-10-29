@@ -1,5 +1,6 @@
 import { useSyncExternalStore } from 'react';
-import { NamedIcon, type ReplacementProps, type ServerCardMetric, type ServerCardState } from '@pterodactyl/sdk';
+import { NamedIcon } from '@pterodactyl/sdk';
+import { View, type ServerCardState, type ServerStatMetric as ServerCardMetric, type ViewProps } from '@pterodactyl/sdk/theme';
 import { dashboardMode, onLayoutChange } from '../runtime';
 
 type Tone = 'success' | 'warning' | 'danger' | 'muted';
@@ -68,19 +69,18 @@ function Metric({ label, icon, metric, format }: { label: string; icon: string; 
  * has no interactive elements. Rows and cards share this markup; the layout comes from
  * <html data-ct-dashboard>, set from the theme stylesheet.
  */
-export default function ServerCard({ model, parts, Default }: ReplacementProps<'dashboard.serverCard'>) {
+export default function ServerCard({ model, server, className, Default }: ViewProps<'dashboard.serverCard'>) {
     const mode = useSyncExternalStore(onLayoutChange, dashboardMode, () => 'rows');
     if (mode === 'panel') return <Default />;
 
-    const Identity = parts.identity;
     const [label, tone] = status(model.state);
     const { state } = model;
 
     return (
-        <div className={'ct-card'} data-tone={tone}>
+        <div className={className ? `ct-card ${className}` : 'ct-card'} data-tone={tone}>
             <div className={'ct-card-main'}>
-                {/* The native identity part keeps the dashboard.serverRow.name.after slot. */}
-                <Identity model={model} />
+                {/* The native identity view keeps the dashboard.serverRow.name.after slot. */}
+                <View name={'dashboard.serverCard.identity'} model={model} server={server} />
                 <span className={'ct-status'} data-tone={tone}>
                     <i aria-hidden />
                     {label}

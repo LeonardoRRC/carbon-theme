@@ -56,9 +56,9 @@ export default function IconPicker({ open, title, catalog, current, onClose, onS
 
     return (
         <Dialog open={open} onClose={onClose} title={title}>
-            <div className={'ct:flex ct:flex-col ct:gap-4'}>
-                <div className={'ct:grid ct:gap-3 ct:sm:grid-cols-2'}>
-                    <div className={'ct:flex ct:flex-col ct:gap-2'}>
+            <div className={'flex flex-col gap-4'}>
+                <div className={'grid gap-3 sm:grid-cols-2'}>
+                    <div className={'flex flex-col gap-2'}>
                         <Label htmlFor={'ct-icon-pack'}>Icon pack</Label>
                         <Select
                             id={'ct-icon-pack'}
@@ -68,7 +68,7 @@ export default function IconPicker({ open, title, catalog, current, onClose, onS
                             onChange={(value) => setPack(String(value))}
                         />
                     </div>
-                    <div className={'ct:flex ct:flex-col ct:gap-2'}>
+                    <div className={'flex flex-col gap-2'}>
                         <Label htmlFor={'ct-icon-search'}>Search</Label>
                         <Input
                             id={'ct-icon-search'}
@@ -81,13 +81,13 @@ export default function IconPicker({ open, title, catalog, current, onClose, onS
                     </div>
                 </div>
 
-                <div className={'ct:relative ct:min-h-64'}>
+                <div className={'relative min-h-64'}>
                     {icons.isLoading ? (
-                        <div className={'ct:flex ct:h-64 ct:items-center ct:justify-center'}>
+                        <div className={'flex h-64 items-center justify-center'}>
                             <Spinner />
                         </div>
                     ) : icons.data && icons.data.icons.length > 0 ? (
-                        <div className={'ct:grid ct:max-h-80 ct:grid-cols-6 ct:gap-1 ct:overflow-y-auto ct:sm:grid-cols-8 ct:md:grid-cols-10'}>
+                        <div className={'grid max-h-80 grid-cols-6 gap-1 overflow-y-auto sm:grid-cols-8 md:grid-cols-10'}>
                             {icons.data.icons.map((icon) => {
                                 const reference = `${icon.pack}:${icon.name}`;
                                 const selected = reference === current;
@@ -102,11 +102,11 @@ export default function IconPicker({ open, title, catalog, current, onClose, onS
                                         aria-pressed={selected}
                                         onClick={() => onSelect(reference, icon.svg)}
                                         className={[
-                                            'ct:flex ct:aspect-square ct:items-center ct:justify-center ct:rounded-md ct:border ct:transition-colors',
-                                            'ct:focus-visible:outline-none ct:focus-visible:ring-2 ct:focus-visible:ring-ring',
+                                            'flex aspect-square items-center justify-center rounded-md border transition-colors',
+                                            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
                                             selected
-                                                ? 'ct:border-primary ct:bg-primary/15 ct:text-foreground'
-                                                : 'ct:border-transparent ct:text-muted-foreground ct:hover:border-border ct:hover:bg-muted ct:hover:text-foreground',
+                                                ? 'border-primary bg-primary/15 text-foreground'
+                                                : 'border-transparent text-muted-foreground hover:border-border hover:bg-muted hover:text-foreground',
                                         ].join(' ')}
                                     >
                                         <IconGlyph svg={icon.svg} size={20} />
@@ -115,19 +115,19 @@ export default function IconPicker({ open, title, catalog, current, onClose, onS
                             })}
                         </div>
                     ) : (
-                        <p className={'ct:flex ct:h-64 ct:items-center ct:justify-center ct:text-sm ct:text-muted-foreground'}>
+                        <p className={'flex h-64 items-center justify-center text-sm text-muted-foreground'}>
                             No icons match &ldquo;{search}&rdquo;.
                         </p>
                     )}
                 </div>
 
-                <div className={'ct:flex ct:flex-wrap ct:items-center ct:justify-between ct:gap-3 ct:text-xs ct:text-muted-foreground'}>
+                <div className={'flex flex-wrap items-center justify-between gap-3 text-xs text-muted-foreground'}>
                     <span>
                         {icons.data ? `${icons.data.total.toLocaleString()} icons` : ' '}
                         {' · '}
                         {packInfo ? (
                             <>
-                                <a href={packInfo.url} target={'_blank'} rel={'noopener noreferrer'} className={'ct:text-accent ct:hover:underline'}>
+                                <a href={packInfo.url} target={'_blank'} rel={'noopener noreferrer'} className={'text-accent hover:underline'}>
                                     {packInfo.name}
                                 </a>
                                 , {packInfo.license}
@@ -135,14 +135,14 @@ export default function IconPicker({ open, title, catalog, current, onClose, onS
                         ) : (
                             <>
                                 {catalog.packs.length} packs from{' '}
-                                <a href={'https://react-icons.github.io/react-icons/'} target={'_blank'} rel={'noopener noreferrer'} className={'ct:text-accent ct:hover:underline'}>
+                                <a href={'https://react-icons.github.io/react-icons/'} target={'_blank'} rel={'noopener noreferrer'} className={'text-accent hover:underline'}>
                                     react-icons
                                 </a>{' '}
                                 {catalog.version}
                             </>
                         )}
                     </span>
-                    <span className={'ct:flex ct:items-center ct:gap-2'}>
+                    <span className={'flex items-center gap-2'}>
                         <Button size={'xsmall'} isSecondary disabled={page <= 1} onClick={() => setPage(page - 1)}>
                             Previous
                         </Button>

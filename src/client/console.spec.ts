@@ -44,6 +44,17 @@ test('does nothing on pages without a terminal', () => {
     expect(document.querySelector('[data-ct-console]')).toBeNull();
 });
 
+test("ignores terminal previews, such as the editor's console designs", () => {
+    document.body.innerHTML = `
+        <div><h1>Carbon Theme</h1></div>
+        <div id="box" data-ui="card">
+            <div data-part="header"><h2>Console</h2></div>
+            <div data-part="body"><button><span aria-hidden="true"><span class="bg-terminal"></span></span></button></div>
+        </div>`;
+    tagConsole(document);
+    expect(document.querySelector('[data-ct-console]')).toBeNull();
+});
+
 test('formats uptime', () => {
     expect(formatUptime(42_000)).toBe('0m 42s');
     expect(formatUptime(4 * 60_000 + 10_000)).toBe('4m 10s');

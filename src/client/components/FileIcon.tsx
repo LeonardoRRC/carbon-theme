@@ -1,4 +1,7 @@
-import { NamedIcon, type ComponentPartProps, type FileDetailsModel } from '@pterodactyl/sdk';
+import { NamedIcon } from '@pterodactyl/sdk';
+import type { ViewModel } from '@pterodactyl/sdk/theme';
+
+type FileDetailsModel = ViewModel<'server.files.details'>;
 
 type Tone = 'primary' | 'accent' | 'success' | 'warning' | 'muted' | 'chart-3' | 'chart-4';
 
@@ -27,7 +30,7 @@ export function iconFor(model: Pick<FileDetailsModel, 'name' | 'kind'>): [icon: 
 }
 
 /** Replaces the native row icon with a tinted badge. Presentation only: the row stays the Panel's. */
-export default function FileIcon({ model }: ComponentPartProps<'server.files.details'>) {
+export default function FileIcon({ model }: { model: Pick<FileDetailsModel, 'name' | 'kind'> }) {
     const [icon, tone] = iconFor(model);
 
     return (

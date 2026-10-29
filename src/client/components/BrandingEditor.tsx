@@ -25,7 +25,7 @@ function UploadButton({ accept, label, busy, onFile }: { accept: string; label: 
                 ref={input}
                 type={'file'}
                 accept={accept}
-                className={'ct:hidden'}
+                className={'hidden'}
                 onChange={(event) => {
                     const file = event.target.files?.[0];
                     if (file) onFile(file);
@@ -42,7 +42,7 @@ function UploadButton({ accept, label, busy, onFile }: { accept: string; label: 
 function Section({ title, description, children }: { title: string; description: string; children: ReactNode }) {
     return (
         <TitledGreyBox title={title}>
-            <p className={'ct:mb-4 ct:text-sm ct:text-muted-foreground'}>{description}</p>
+            <p className={'mb-4 text-sm text-muted-foreground'}>{description}</p>
             {children}
         </TitledGreyBox>
     );
@@ -70,16 +70,16 @@ export default function BrandingEditor({ payload, draft, onChange, onUploaded }:
     const mode = draft.logo_mode;
 
     return (
-        <div className={'ct:flex ct:flex-col ct:gap-6'}>
+        <div className={'flex flex-col gap-6'}>
             <Section title={'Logo'} description={'Shown in the header on every page and on the login page. PNG, JPG, WebP, or SVG, up to 1 MB. Uploads apply right away.'}>
-                <div className={'ct:grid ct:gap-6 ct:lg:grid-cols-2'}>
-                    <div className={'ct:flex ct:flex-col ct:gap-3'}>
-                        <span className={'ct:text-xs ct:font-medium ct:tracking-wide ct:text-muted-foreground ct:uppercase'}>Header preview</span>
-                        <div className={'ct:flex ct:h-14 ct:items-center ct:gap-2.5 ct:rounded-md ct:border ct:border-border ct:bg-background ct:px-4'}>
-                            {logo && mode !== 'name' && <img src={logo} alt={''} className={'ct:h-8 ct:max-w-48 ct:object-contain'} />}
-                            {(mode !== 'logo' || !logo) && <span className={'ct:font-header ct:text-xl ct:font-medium ct:text-foreground'}>{name}</span>}
+                <div className={'grid gap-6 lg:grid-cols-2'}>
+                    <div className={'flex flex-col gap-3'}>
+                        <span className={'text-xs font-medium tracking-wide text-muted-foreground uppercase'}>Header preview</span>
+                        <div className={'flex h-14 items-center gap-2.5 rounded-md border border-border bg-background px-4'}>
+                            {logo && mode !== 'name' && <img src={logo} alt={''} className={'h-8 max-w-48 object-contain'} />}
+                            {(mode !== 'logo' || !logo) && <span className={'font-header text-xl font-medium text-foreground'}>{name}</span>}
                         </div>
-                        <div className={'ct:flex ct:gap-2'}>
+                        <div className={'flex gap-2'}>
                             <UploadButton accept={'.png,.jpg,.jpeg,.webp,.svg'} label={logo ? 'Replace logo' : 'Upload logo'} busy={logoUpload.isPending} onFile={(file) => logoUpload.mutate(file)} />
                             {logo && (
                                 <Button.Text size={'small'} disabled={logoRemove.isPending} onClick={() => logoRemove.mutate()}>
@@ -88,8 +88,8 @@ export default function BrandingEditor({ payload, draft, onChange, onUploaded }:
                             )}
                         </div>
                     </div>
-                    <div role={'radiogroup'} aria-label={'Header shows'} className={'ct:flex ct:flex-col ct:gap-2'}>
-                        <span className={'ct:text-xs ct:font-medium ct:tracking-wide ct:text-muted-foreground ct:uppercase'}>Header shows</span>
+                    <div role={'radiogroup'} aria-label={'Header shows'} className={'flex flex-col gap-2'}>
+                        <span className={'text-xs font-medium tracking-wide text-muted-foreground uppercase'}>Header shows</span>
                         {MODES.map((option) => (
                             <button
                                 key={option.value}
@@ -99,14 +99,14 @@ export default function BrandingEditor({ payload, draft, onChange, onUploaded }:
                                 disabled={!logo && option.value !== 'name'}
                                 onClick={() => onChange({ ...draft, logo_mode: option.value })}
                                 className={[
-                                    'ct:flex ct:items-center ct:gap-3 ct:rounded-md ct:border ct:px-3 ct:py-2 ct:text-left ct:transition-colors ct:disabled:opacity-50',
-                                    mode === option.value ? 'ct:border-primary ct:bg-primary/10' : 'ct:border-border ct:bg-card ct:hover:bg-muted',
+                                    'flex items-center gap-3 rounded-md border px-3 py-2 text-left transition-colors disabled:opacity-50',
+                                    mode === option.value ? 'border-primary bg-primary/10' : 'border-border bg-card hover:bg-muted',
                                 ].join(' ')}
                             >
-                                <span className={['ct:size-3 ct:shrink-0 ct:rounded-full ct:border-2', mode === option.value ? 'ct:border-primary ct:bg-primary' : 'ct:border-muted-foreground'].join(' ')} />
-                                <span className={'ct:flex ct:flex-col'}>
-                                    <span className={'ct:text-sm ct:font-medium ct:text-foreground'}>{option.label}</span>
-                                    <span className={'ct:text-xs ct:text-muted-foreground'}>{option.description}</span>
+                                <span className={['size-3 shrink-0 rounded-full border-2', mode === option.value ? 'border-primary bg-primary' : 'border-muted-foreground'].join(' ')} />
+                                <span className={'flex flex-col'}>
+                                    <span className={'text-sm font-medium text-foreground'}>{option.label}</span>
+                                    <span className={'text-xs text-muted-foreground'}>{option.description}</span>
                                 </span>
                             </button>
                         ))}
@@ -115,10 +115,10 @@ export default function BrandingEditor({ payload, draft, onChange, onUploaded }:
             </Section>
 
             <Section title={'Favicon'} description={'The icon in browser tabs and bookmarks. PNG, ICO, or SVG, up to 512 KB; a square PNG of at least 64 pixels looks best.'}>
-                <div className={'ct:flex ct:flex-wrap ct:items-center ct:gap-4'}>
-                    <div className={'ct:flex ct:h-10 ct:items-center ct:gap-2 ct:rounded-t-md ct:border ct:border-b-0 ct:border-border ct:bg-muted ct:px-3 ct:text-sm ct:text-foreground'}>
-                        {favicon ? <img src={favicon} alt={''} className={'ct:size-4 ct:object-contain'} /> : <NamedIcon name={'globe'} className={'ct:size-4 ct:text-muted-foreground'} />}
-                        <span className={'ct:max-w-40 ct:truncate'}>{name}</span>
+                <div className={'flex flex-wrap items-center gap-4'}>
+                    <div className={'flex h-10 items-center gap-2 rounded-t-md border border-b-0 border-border bg-muted px-3 text-sm text-foreground'}>
+                        {favicon ? <img src={favicon} alt={''} className={'size-4 object-contain'} /> : <NamedIcon name={'globe'} className={'size-4 text-muted-foreground'} />}
+                        <span className={'max-w-40 truncate'}>{name}</span>
                     </div>
                     <UploadButton accept={'.png,.ico,.svg'} label={favicon ? 'Replace favicon' : 'Upload favicon'} busy={faviconUpload.isPending} onFile={(file) => faviconUpload.mutate(file)} />
                     {favicon && (

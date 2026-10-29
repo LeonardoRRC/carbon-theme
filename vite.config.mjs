@@ -1,3 +1,3 @@
-import { defineExtensionConfig } from '@pterodactyl/sdk/vite';
+import { defineThemeConfig } from '@pterodactyl/sdk/vite';
 
-export default defineExtensionConfig({ entry: 'src/client/index.tsx' });
+export default defineThemeConfig({ entry: 'src/client/index.tsx', stylesheet: 'src/client/styles.css' });

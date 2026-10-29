@@ -1,11 +1,12 @@
 {
     "$schema": "./node_modules/@pterodactyl/sdk/manifest.schema.json",
     "id": "carbon-theme",
+    "type": "theme",
     "name": "Carbon Theme",
-    "version": "1.3.0",
+    "version": "2.0.0",
     "requires": {
-        "panel": "^2.0.0-dev",
-        "sdk": "^2.0.0-beta.4",
+        "panel": "^2.0.0-beta.1",
+        "sdk": ">=2.0.0-beta.6 <3.0",
         "php": "^8.3"
     },
     "description": "Carbon dark palettes with a live admin editor: console and file manager designs, layouts, server cards, fonts, branding, sidebar groups, and 50,000+ navigation icons.",
@@ -17,8 +18,6 @@
     },
     "ui": {
         "entry": "dist/client.js",
-        "mode": "native",
-        "prefix": "ct",
         "screens": [
             {
                 "id": "settings",
@@ -29,11 +28,187 @@
                     "icon": "palette"
                 }
             }
-        ],
-        "components": [
-            "dashboard.serverCard",
-            "server.files.manager",
-            "server.files.details"
         ]
+    },
+    "theme": {
+        "extends": "classic",
+        "stylesheet": "dist/theme.css",
+        "schemes": [
+            "dark"
+        ],
+        "settings": {
+            "background": {
+                "type": "color",
+                "label": "Background",
+                "help": "Kept in step with the Carbon Theme editor, so the page has Carbon's colours before it loads.",
+                "token": "--background",
+                "tab": "Carbon (managed)"
+            },
+            "card": {
+                "type": "color",
+                "label": "Card",
+                "help": "Kept in step with the Carbon Theme editor, so the page has Carbon's colours before it loads.",
+                "token": "--card",
+                "tab": "Carbon (managed)"
+            },
+            "popover": {
+                "type": "color",
+                "label": "Popover",
+                "help": "Kept in step with the Carbon Theme editor, so the page has Carbon's colours before it loads.",
+                "token": "--popover",
+                "tab": "Carbon (managed)"
+            },
+            "muted": {
+                "type": "color",
+                "label": "Muted",
+                "help": "Kept in step with the Carbon Theme editor, so the page has Carbon's colours before it loads.",
+                "token": "--muted",
+                "tab": "Carbon (managed)"
+            },
+            "foreground": {
+                "type": "color",
+                "label": "Foreground",
+                "help": "Kept in step with the Carbon Theme editor, so the page has Carbon's colours before it loads.",
+                "token": "--foreground",
+                "tab": "Carbon (managed)"
+            },
+            "muted_foreground": {
+                "type": "color",
+                "label": "Muted foreground",
+                "help": "Kept in step with the Carbon Theme editor, so the page has Carbon's colours before it loads.",
+                "token": "--muted-foreground",
+                "tab": "Carbon (managed)"
+            },
+            "card_foreground": {
+                "type": "color",
+                "label": "Card foreground",
+                "help": "Kept in step with the Carbon Theme editor, so the page has Carbon's colours before it loads.",
+                "token": "--card-foreground",
+                "tab": "Carbon (managed)"
+            },
+            "popover_foreground": {
+                "type": "color",
+                "label": "Popover foreground",
+                "help": "Kept in step with the Carbon Theme editor, so the page has Carbon's colours before it loads.",
+                "token": "--popover-foreground",
+                "tab": "Carbon (managed)"
+            },
+            "primary": {
+                "type": "color",
+                "label": "Primary",
+                "help": "Kept in step with the Carbon Theme editor, so the page has Carbon's colours before it loads.",
+                "token": "--primary",
+                "tab": "Carbon (managed)"
+            },
+            "primary_foreground": {
+                "type": "color",
+                "label": "Primary foreground",
+                "help": "Kept in step with the Carbon Theme editor, so the page has Carbon's colours before it loads.",
+                "token": "--primary-foreground",
+                "tab": "Carbon (managed)"
+            },
+            "secondary": {
+                "type": "color",
+                "label": "Secondary",
+                "help": "Kept in step with the Carbon Theme editor, so the page has Carbon's colours before it loads.",
+                "token": "--secondary",
+                "tab": "Carbon (managed)"
+            },
+            "secondary_foreground": {
+                "type": "color",
+                "label": "Secondary foreground",
+                "help": "Kept in step with the Carbon Theme editor, so the page has Carbon's colours before it loads.",
+                "token": "--secondary-foreground",
+                "tab": "Carbon (managed)"
+            },
+            "accent": {
+                "type": "color",
+                "label": "Accent",
+                "help": "Kept in step with the Carbon Theme editor, so the page has Carbon's colours before it loads.",
+                "token": "--accent",
+                "tab": "Carbon (managed)"
+            },
+            "accent_foreground": {
+                "type": "color",
+                "label": "Accent foreground",
+                "help": "Kept in step with the Carbon Theme editor, so the page has Carbon's colours before it loads.",
+                "token": "--accent-foreground",
+                "tab": "Carbon (managed)"
+            },
+            "ring": {
+                "type": "color",
+                "label": "Ring",
+                "help": "Kept in step with the Carbon Theme editor, so the page has Carbon's colours before it loads.",
+                "token": "--ring",
+                "tab": "Carbon (managed)"
+            },
+            "border": {
+                "type": "color",
+                "label": "Border",
+                "help": "Kept in step with the Carbon Theme editor, so the page has Carbon's colours before it loads.",
+                "token": "--border",
+                "tab": "Carbon (managed)"
+            },
+            "input": {
+                "type": "color",
+                "label": "Input",
+                "help": "Kept in step with the Carbon Theme editor, so the page has Carbon's colours before it loads.",
+                "token": "--input",
+                "tab": "Carbon (managed)"
+            },
+            "destructive": {
+                "type": "color",
+                "label": "Destructive",
+                "help": "Kept in step with the Carbon Theme editor, so the page has Carbon's colours before it loads.",
+                "token": "--destructive",
+                "tab": "Carbon (managed)"
+            },
+            "destructive_foreground": {
+                "type": "color",
+                "label": "Destructive foreground",
+                "help": "Kept in step with the Carbon Theme editor, so the page has Carbon's colours before it loads.",
+                "token": "--destructive-foreground",
+                "tab": "Carbon (managed)"
+            },
+            "success": {
+                "type": "color",
+                "label": "Success",
+                "help": "Kept in step with the Carbon Theme editor, so the page has Carbon's colours before it loads.",
+                "token": "--success",
+                "tab": "Carbon (managed)"
+            },
+            "success_foreground": {
+                "type": "color",
+                "label": "Success foreground",
+                "help": "Kept in step with the Carbon Theme editor, so the page has Carbon's colours before it loads.",
+                "token": "--success-foreground",
+                "tab": "Carbon (managed)"
+            },
+            "warning": {
+                "type": "color",
+                "label": "Warning",
+                "help": "Kept in step with the Carbon Theme editor, so the page has Carbon's colours before it loads.",
+                "token": "--warning",
+                "tab": "Carbon (managed)"
+            },
+            "warning_foreground": {
+                "type": "color",
+                "label": "Warning foreground",
+                "help": "Kept in step with the Carbon Theme editor, so the page has Carbon's colours before it loads.",
+                "token": "--warning-foreground",
+                "tab": "Carbon (managed)"
+            },
+            "radius": {
+                "type": "number",
+                "label": "Corner radius",
+                "help": "Kept in step with the Carbon Theme editor.",
+                "min": 0,
+                "max": 1.5,
+                "step": 0.001,
+                "unit": "rem",
+                "token": "--radius",
+                "tab": "Carbon (managed)"
+            }
+        }
     }
 }

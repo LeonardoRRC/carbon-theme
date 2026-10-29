@@ -33,25 +33,25 @@ function PresetCard({ name, description, colors, selected, onSelect }: {
             aria-checked={selected}
             onClick={onSelect}
             className={[
-                'ct:flex ct:flex-col ct:gap-3 ct:rounded-md ct:border ct:p-3 ct:text-left ct:transition-colors',
-                'ct:focus-visible:outline-none ct:focus-visible:ring-2 ct:focus-visible:ring-ring',
-                selected ? 'ct:border-primary ct:bg-primary/10' : 'ct:border-border ct:bg-card ct:hover:bg-muted',
+                'flex flex-col gap-3 rounded-md border p-3 text-left transition-colors',
+                'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                selected ? 'border-primary bg-primary/10' : 'border-border bg-card hover:bg-muted',
             ].join(' ')}
         >
-            <span className={'ct:flex ct:h-8 ct:overflow-hidden ct:rounded-sm ct:border ct:border-border'}>
+            <span className={'flex h-8 overflow-hidden rounded-sm border border-border'}>
                 {colors ? (
                     SWATCHES.map((token) => (
-                        <span key={token} className={'ct:flex-1'} style={{ backgroundColor: colors[token] }} />
+                        <span key={token} className={'flex-1'} style={{ backgroundColor: colors[token] }} />
                     ))
                 ) : (
-                    <span className={'ct:flex ct:flex-1 ct:items-center ct:justify-center ct:text-xs ct:text-muted-foreground'}>
+                    <span className={'flex flex-1 items-center justify-center text-xs text-muted-foreground'}>
                         Panel colors
                     </span>
                 )}
             </span>
-            <span className={'ct:flex ct:flex-col ct:gap-0.5'}>
-                <span className={'ct:text-sm ct:font-medium ct:text-foreground'}>{name}</span>
-                <span className={'ct:text-xs ct:text-muted-foreground'}>{description}</span>
+            <span className={'flex flex-col gap-0.5'}>
+                <span className={'text-sm font-medium text-foreground'}>{name}</span>
+                <span className={'text-xs text-muted-foreground'}>{description}</span>
             </span>
         </button>
     );
@@ -63,16 +63,16 @@ function ColorField({ token, label, value, onChange }: { token: string; label: s
     const id = `ct-color-${token}`;
 
     return (
-        <div className={'ct:flex ct:items-center ct:gap-3'}>
+        <div className={'flex items-center gap-3'}>
             <input
                 type={'color'}
                 aria-label={`${label} color`}
                 value={value.slice(0, 7)}
                 onChange={(event) => onChange(event.target.value + value.slice(7))}
-                className={'ct:size-9 ct:shrink-0 ct:cursor-pointer ct:rounded-md ct:border ct:border-border ct:bg-transparent ct:p-0.5'}
+                className={'size-9 shrink-0 cursor-pointer rounded-md border border-border bg-transparent p-0.5'}
             />
-            <div className={'ct:flex ct:min-w-0 ct:flex-1 ct:flex-col ct:gap-1'}>
-                <Label htmlFor={id} className={'ct:truncate'}>
+            <div className={'flex min-w-0 flex-1 flex-col gap-1'}>
+                <Label htmlFor={id} className={'truncate'}>
                     {label}
                 </Label>
                 <Input
@@ -81,7 +81,7 @@ function ColorField({ token, label, value, onChange }: { token: string; label: s
                     spellCheck={false}
                     maxLength={9}
                     $hasError={!HEX.test(text)}
-                    className={'ct:font-mono ct:text-xs'}
+                    className={'font-mono text-xs'}
                     onChange={(event) => {
                         const next = event.target.value.trim();
                         setText(next);
@@ -96,19 +96,19 @@ function ColorField({ token, label, value, onChange }: { token: string; label: s
 
 function Preview() {
     return (
-        <div className={'ct:flex ct:flex-col ct:gap-4'}>
+        <div className={'flex flex-col gap-4'}>
             <Alert type={'success'} title={'Server installed'}>
                 Your server is ready to start.
             </Alert>
             <Alert type={'warning'}>Disk usage is above 90%.</Alert>
-            <div className={'ct:flex ct:flex-col ct:gap-2'}>
+            <div className={'flex flex-col gap-2'}>
                 <Label htmlFor={'ct-preview-input'}>Server name</Label>
                 <Input id={'ct-preview-input'} defaultValue={'Survival'} />
             </div>
-            <p className={'ct:text-sm ct:text-muted-foreground'}>
-                Secondary text and <a className={'ct:text-accent ct:hover:underline'} href={'#'} onClick={(e) => e.preventDefault()}>a link</a>.
+            <p className={'text-sm text-muted-foreground'}>
+                Secondary text and <a className={'text-accent hover:underline'} href={'#'} onClick={(e) => e.preventDefault()}>a link</a>.
             </p>
-            <div className={'ct:flex ct:flex-wrap ct:gap-2'}>
+            <div className={'flex flex-wrap gap-2'}>
                 <Button>Primary</Button>
                 <Button isSecondary>Secondary</Button>
                 <Button.Danger>Delete</Button.Danger>
@@ -136,10 +136,10 @@ export default function PaletteEditor({ payload, draft, onChange }: Props) {
     const radius = draft.radius ?? 0.5;
 
     return (
-        <div className={'ct:grid ct:items-start ct:gap-6 ct:xl:grid-cols-3'}>
-            <div className={'ct:flex ct:flex-col ct:gap-6 ct:xl:col-span-2'}>
+        <div className={'grid items-start gap-6 xl:grid-cols-3'}>
+            <div className={'flex flex-col gap-6 xl:col-span-2'}>
                 <TitledGreyBox title={'Palette'}>
-                    <div role={'radiogroup'} aria-label={'Palette'} className={'ct:grid ct:gap-3 ct:sm:grid-cols-2 ct:lg:grid-cols-4'}>
+                    <div role={'radiogroup'} aria-label={'Palette'} className={'grid gap-3 sm:grid-cols-2 lg:grid-cols-4'}>
                         {Object.entries(payload.presets).map(([id, preset]) => (
                             <PresetCard
                                 key={id}
@@ -170,13 +170,13 @@ export default function PaletteEditor({ payload, draft, onChange }: Props) {
                     <Alert type={'info'}>The Panel&apos;s own colors are used. Layout, fonts, branding, and icons still apply.</Alert>
                 ) : (
                     <TitledGreyBox title={'Colors'}>
-                        <div className={'ct:flex ct:flex-col ct:gap-6'}>
+                        <div className={'flex flex-col gap-6'}>
                             {GROUPS.map((group) => (
-                                <section key={group.id} className={'ct:flex ct:flex-col ct:gap-3'}>
-                                    <h3 className={'ct:text-xs ct:font-medium ct:tracking-wide ct:text-muted-foreground ct:uppercase'}>
+                                <section key={group.id} className={'flex flex-col gap-3'}>
+                                    <h3 className={'text-xs font-medium tracking-wide text-muted-foreground uppercase'}>
                                         {group.title}
                                     </h3>
-                                    <div className={'ct:grid ct:gap-4 ct:sm:grid-cols-2'}>
+                                    <div className={'grid gap-4 sm:grid-cols-2'}>
                                         {payload.tokens
                                             .filter((token) => token.group === group.id)
                                             .map((token) => (
@@ -191,12 +191,12 @@ export default function PaletteEditor({ payload, draft, onChange }: Props) {
                                     </div>
                                 </section>
                             ))}
-                            <section className={'ct:flex ct:flex-col ct:gap-3'}>
-                                <h3 className={'ct:text-xs ct:font-medium ct:tracking-wide ct:text-muted-foreground ct:uppercase'}>
+                            <section className={'flex flex-col gap-3'}>
+                                <h3 className={'text-xs font-medium tracking-wide text-muted-foreground uppercase'}>
                                     Shape
                                 </h3>
-                                <div className={'ct:flex ct:items-center ct:gap-4'}>
-                                    <Label htmlFor={'ct-radius'} className={'ct:shrink-0'}>
+                                <div className={'flex items-center gap-4'}>
+                                    <Label htmlFor={'ct-radius'} className={'shrink-0'}>
                                         Corner radius
                                     </Label>
                                     <input
@@ -207,9 +207,9 @@ export default function PaletteEditor({ payload, draft, onChange }: Props) {
                                         step={0.125}
                                         value={radius}
                                         onChange={(event) => onChange({ ...draft, preset: draft.preset === 'none' ? 'none' : 'custom', radius: Number(event.target.value) })}
-                                        className={'ct:flex-1 ct:accent-primary'}
+                                        className={'flex-1 accent-primary'}
                                     />
-                                    <span className={'ct:w-16 ct:text-right ct:font-mono ct:text-xs ct:text-muted-foreground'}>
+                                    <span className={'w-16 text-right font-mono text-xs text-muted-foreground'}>
                                         {radius}rem
                                     </span>
                                 </div>
